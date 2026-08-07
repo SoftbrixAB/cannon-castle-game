@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Cannon Castle Game</title>
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.80.1/dist/phaser.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #87CEEB; overflow: hidden; touch-action: none; user-select: none; }
+        #game { width: 100vw; height: 100vh; display: block; }
+    </style>
+</head>
+<body>
+    <div id="game"></div>
+    <script>
+        // ========== CONFIG ==========
+        const CONFIG = {
+            type: Phaser.AUTO,
+            width: 800,
+            height: 600,
+            parent: 'game',
+            backgroundColor: '#87CEEB',
+            physics: { default: 'arcade', arcade: { gravity: { y: 400 }, debug: false } },
+            scene: [MainScene]
+        };
+
+        // ========== CANNONBALLS ==========
+        const CANNONBALLS = {
+            small: { radius: 8, damage: 10, mass: 1, color: 0x333333, drag: 0.98, label: 'S' },
+            medium: { radius: 12, damage: 25, mass: 2, color: 0x222222, drag: 0.96, label: 'M' },
+            large: { radius: 18, damage: 50, mass: 4, color: 0x111111, drag: 0.94, label: 'L' }
+        };
+
+        // ========== CASTLES ==========
+        const CASTLES = [
+            {
+                name: 'Neuschwanstein',
+                colors: { stone: 0xE8D5B7, roof: 0x8B4513, detail: 0x5D4037, window: 0x2E7D32 },
+                difficulty: 1.2,
+                draw: function(scene, x, y) {
+                    const g = scene.add.graphics();
+                    
+                    // Main tower
+                    g.fillStyle(this.colors.stone, 1);
+                    g.fillRect(x, y - 200, 80, 200);
+                    g.lineStyle(2, this.colors.detail);
+                    g.strokeRect(x, y - 200, 80, 200);
+                    
+                    // Conical roof
+                    g.fillStyle(this.colors.roof, 1);
+                    g.beginPath();
+                    g.moveTo(x - 5, y - 200);
+                    g.lineTo(x + 40, y - 260);
+                    g.lineTo(x + 85, y - 200);
+                    g.closePath();
+                    g.fillPath();
+                    
+                    // Side towers
+                    g.fillStyle(this.colors.stone, 1);
+                    g.fillRect(x - 80, y - 120, 60, 120);
+                    g.fillRect(x + 80, y - 120, 60, 120);
+                    
+                    // Pointed roofs
+                    g.fillStyle(this.colors.roof, 1);
+                    g.beginPath();
+                    g.moveTo(x - 80, y - 120);
+                    g.lineTo(x - 50, y - 180);
+                    g.lineTo(x - 20, y - 120);
+                    g.closePath();
+                    g.fillPath();
+                    g.beginPath();
+                    g.moveTo(x + 80, y - 120);
+                    g.lineTo(x + 110, y - 180);
+                    g.lineTo(x + 140, y - 120);
+                    g.closePath();
+                    g.fillPath();
+                    
+                    // Walls
+                    g.fillStyle(this.colors.stone, 1);
+                    g.fillRect(x - 60, y - 60, 200, 30);
+                    
+                    // Windows
+                    g.fillStyle(this.colors.window, 1);
+                    for (let i = 0; i < 3; i++) {
+                        g.fillRect(x + 10 + i * 20, y - 180 + i * 30, 10, 15);
+                        g.fillRect(x + 40 + i * 20, y - 180 + i * 30, 10, 15);
+                    }
+                    
+                    return g;
+                }
+            },
+            {
+                name: 'Schönbrunn',
+                colors: { stone: 0xF5E6D3, roof: 0x4E342E, detail: 0x3E2723, window: 0x1B5E20 },
+                difficulty: 1.0,
+                draw: function(scene, x, y) {
+                    const g = scene.add.graphics();
+                    
+                    // Main building (Baroque style)
+                    g.fillStyle(this.colors.stone, 1);
+                    g.fillRect(x - 100, y - 100, 200, 100);
+                    g.lineStyle(2, this.colors.detail);
+                    g.strokeRect(x - 100, y - 100, 200, 100);
+                    
+                    // Mansard roof
+                    g.fillStyle(this.colors.roof, 1);
+                    g.fillRect(x - 110, y - 100, 220, 20);
+                    g.beginPath();
+                    g.moveTo(x - 110, y - 100);
+                    g.lineTo(x - 120, y - 120);
+                    g.lineTo(x + 120, y - 120);
+                    g.lineTo(x + 110, y - 100);
+                    g.closePath();
+                    g.fillPath();
+                    
+                    // Side wings
+                    g.fillStyle(this.colors.stone, 1);
+                    g.fillRect(x - 180, y - 60, 80, 60);
+                    g.fillRect(x + 100, y - 60, 80, 60);
+                    
+                    // Decorative columns
+                    g.fillStyle(this.colors.detail, 1);
+                    for (let i = 0; i < 3; i++) {
+                        g.fillRect(x - 80 + i * 40, y - 100, 5, 30);
+                        g.fillRect(x - 85 + i * 40, y - 100, 15, 5);
+                    }
+                    
+                    // Windows
+                    g.fillStyle(this.colors.window, 1);
+                    for (let i = 0; i < 5; i++) {
+                        g.fillRect(x - 90 + i * 40, y - 80, 12, 18);
+                        g.fillRect(x - 90 + i * 40, y - 40, 12, 18);
+                    }
+                    
+                    // Gardens (simplified)
+                    g.fillStyle(0x2E8B57, 0.4);
+                    g.fillRect(x - 150, y, 300, 40);
+                    
+                    return g;
+                }
+            }
+        ];
+
+        // ========== MINI-GAMES ==========
+        const MINI_GAMES = [
+            { id: 'trivia', name: 'Castle Trivia', icon: '📚' },
+            { id: 'reflex', name: 'Quick Reflex', icon: '🎯' }
+        ];
+
+        const TRIVIA = [
+            { q: "Which castle inspired Disney's Sleeping Beauty?", a: ["Neuschwanstein","Edinburgh","Himeji","Windsor"], correct: 0 },
+            { q: "Where is Schönbrunn Palace?", a: ["Germany","Austria","France","Italy"], correct: 1 },
+            { q: "What style is Neuschwanstein?", a: ["Baroque","Romanesque","Gothic Revival","Renaissance"], correct: 2 }
+        ];
+
+        // ========== MAIN SCENE ==========
+        class MainScene extends Phaser.Scene {
+            constructor() { super({ key: 'MainScene' }); }
+
+            create() {
+                this.state = {
+                    score: 0, castles: 0, time: 120, maxTime: 120, active: true,
+                    ballSize: 'medium', powder: 0, maxPowder: 100
+                };
+
+                this.physics.world.setBounds(0, 0, 800, 600);
+                this.input.on('pointerdown', this.onPointerDown, this);
+                this.input.on('pointermove', this.onPointerMove, this);
+                this.input.on('pointerup', this.onPointerUp, this);
+
+                this.createBG();
+                this.createCastle();
+                this.createCannon();
+                this.createUI();
+                this.createTimer();
+                this.createMiniGameBtn();
+
+                this.dragging = false;
+            }
+
+            createBG() {
+                const g = this.add.graphics();
+                g.fillGradientStyle(0x87CEEB, 0x87CEEB, 0xE0F7FF, 0xE0F7FF);
+                g.fillRect(0, 0, 800, 600);
+                g.fillStyle(0x228B22);
+                g.fillRect(0, 500, 800, 100);
+            }
+
+            createCastle() {
+                this.castleIdx = 0;
+                this.castle = new Castle(this, CASTLES[this.castleIdx]);
+            }
+
+            createCannon() {
+                // Base
+                const base = this.add.graphics();
+                base.fillStyle(0x5C4033);
+                base.fillRect(60, 490, 80, 30);
+                base.fillCircle(75, 520, 15);
+                base.fillCircle(125, 520, 15);
+
+                // Barrel
+                this.barrel = this.add.graphics();
+                this.barrel.fillStyle(0x2F4F4F);
+                this.barrel.fillRect(0, -10, 80, 20);
+                this.barrel.setPosition(140, 500);
+                this.barrel.setOrigin(0, 0.5);
+                this.angle = -0.3;
+                this.updateBarrel();
+
+                // Powder bag
+                this.powderBtn = this.add.graphics();
+                this.powderBtn.fillStyle(0x8B4513);
+                this.powderBtn.fillRect(20, 450, 40, 50);
+                this.powderBtn.setInteractive(new Phaser.Geom.Rectangle(0,0,40,50));
+                this.powderBtn.on('pointerdown', () => this.addPowder(10));
+                this.add.text(40, 475, '💣');
+
+                // Ball size buttons
+                this.ballBtns = {};
+                ['small','medium','large'].forEach((s,i) => {
+                    const x = 150 + i * 60;
+                    const btn = this.add.graphics();
+                    btn.fillStyle(this.state.ballSize === s ? 0xFFD700 : 0xC0C0C0);
+                    btn.fillCircle(x, 550, 25);
+                    btn.setInteractive(new Phaser.Geom.Circle(x,550,25));
+                    btn.on('pointerdown', () => this.setBall(s));
+                    this.add.text(x, 550, CANNONBALLS[s].label, {font:'20px Arial',fill:'#000'}).setOrigin(0.5);
+                    this.ballBtns[s] = btn;
+                });
+
+                // Fire button
+                this.fireBtn = this.add.graphics();
+                this.fireBtn.fillStyle(0xFF4500);
+                this.fireBtn.fillCircle(0, 0, 25);
+                this.fireBtn.setInteractive(new Phaser.Geom.Circle(0,0,25));
+                this.fireBtn.on('pointerdown', () => this.fire());
+                this.fireBtn.setVisible(false);
+                this.updateFireBtn();
+            }
+
+            updateBarrel() {
+                this.barrel.setRotation(this.angle);
+            }
+
+            updateFireBtn() {
+                const l = 80;
+                const x = 140 + Math.cos(this.angle) * l;
+                const y = 500 + Math.sin(this.angle) * l;
+                this.fireBtn.setPosition(x, y);
+                this.fireBtn.setVisible(this.state.powder > 0);
+            }
+
+            createUI() {
+                this.scoreTxt = this.add.text(20, 20, `Score: ${this.state.score}`, {font:'20px Arial',fill:'#000'});
+                this.castleTxt = this.add.text(20, 50, `Castles: ${this.state.castles}`, {font:'20px Arial',fill:'#000'});
+                this.powderTxt = this.add.text(150, 430, `Powder: ${this.state.powder}%`, {font:'16px Arial',fill:'#000'}).setOrigin(0.5);
+                this.ballTxt = this.add.text(150, 460, `Ball: ${this.state.ballSize.toUpperCase()}`, {font:'16px Arial',fill:'#000'}).setOrigin(0.5);
+            }
+
+            createTimer() {
+                this.timerTxt = this.add.text(700, 20, this.formatTime(this.state.time), {font:'24px Arial',fill:'#000'});
+                this.fireStick = this.add.graphics();
+                this.fireStick.fillStyle(0xFF4500);
+                this.fireStick.fillRect(700, 50, 20, 120);
+                this.fireBurn = this.add.graphics();
+                this.fireBurn.fillStyle(0xFF8C00);
+                this.fireBurn.fillRect(700, 50, 20, 0);
+                this.add.text(700, 80, '🔥');
+
+                this.time.addEvent({delay:1000,callback:()=>{
+                    if (!this.state.active) return;
+                    this.state.time--;
+                    if (this.state.time <= 0) {
+                        this.state.active = false;
+                        this.scene.restart();
+                        return;
+                    }
+                    this.timerTxt.setText(this.formatTime(this.state.time));
+                    const p = (this.state.maxTime - this.state.time) / this.state.maxTime;
+                    this.fireBurn.clear();
+                    this.fireBurn.fillStyle(this.state.time <= 10 ? 0xFF0000 : 0xFF8C00);
+                    this.fireBurn.fillRect(700, 50, 20, 120 * p);
+                },loop:true});
+            }
+
+            formatTime(s) {
+                const m = Math.floor(s/60);
+                const sec = s%60;
+                return `${m}:${sec.toString().padStart(2,'0')}`;
+            }
+
+            createMiniGameBtn() {
+                const btn = this.add.graphics();
+                btn.fillStyle(0x4CAF50);
+                btn.fillRoundedRect(750, 550, 120, 40, 5);
+                btn.setInteractive(new Phaser.Geom.Rectangle(0,0,120,40));
+                btn.on('pointerdown', () => this.startMiniGame());
+                this.add.text(750, 550, 'Mini-Game', {font:'16px Arial',fill:'#fff'}).setOrigin(0.5);
+            }
+
+            startMiniGame() {
+                this.state.active = false;
+                const games = [MINI_GAMES[0]]; // Just trivia for now
+                this.showTrivia(games[0]);
+            }
+
+            showTrivia(game) {
+                // Overlay
+                this.overlay = this.add.graphics();
+                this.overlay.fillStyle(0x000000, 0.8);
+                this.overlay.fillRect(0, 0, 800, 600);
+
+                this.add.text(400, 100, game.name, {font:'32px Arial',fill:'#FFD700'}).setOrigin(0.5);
+                
+                const q = TRIVIA[Math.floor(Math.random()*TRIVIA.length)];
+                this.add.text(400, 200, q.q, {font:'20px Arial',fill:'#fff',wordWrap:{width:600}}).setOrigin(0.5);
+
+                q.a.forEach((a,i) => {
+                    const btn = this.add.graphics();
+                    btn.fillStyle(0x3498DB);
+                    btn.fillRoundedRect(400, 280+i*60, 500, 40, 5);
+                    btn.setInteractive(new Phaser.Geom.Rectangle(0,0,500,40));
+                    btn.on('pointerdown', () => this.checkAnswer(i, q.correct, btn));
+                    this.add.text(400, 280+i*60, a, {font:'18px Arial',fill:'#fff',wordWrap:{width:480}}).setOrigin(0.5);
+                });
+
+                const back = this.add.graphics();
+                back.fillStyle(0xF44336);
+                back.fillRoundedRect(750, 550, 120, 40, 5);
+                back.setInteractive(new Phaser.Geom.Rectangle(0,0,120,40));
+                back.on('pointerdown', () => this.closeMiniGame());
+                this.add.text(750, 550, 'Back', {font:'16px Arial',fill:'#fff'}).setOrigin(0.5);
+            }
+
+            checkAnswer(selected, correct, btn) {
+                if (selected === correct) {
+                    btn.fillStyle(0x2ECC71);
+                    this.time.delayedCall(1000, () => {
+                        this.closeMiniGame();
+                        this.state.time += 15; // Add 15 seconds
+                        this.state.active = true;
+                    });
+                } else {
+                    btn.fillStyle(0xE74C3C);
+                    this.time.delayedCall(1000, () => this.closeMiniGame());
+                }
+            }
+
+            closeMiniGame() {
+                this.overlay.destroy();
+                this.children.each(c => { if (c !== this && c !== this.overlay) c.destroy(); });
+                this.state.active = true;
+                this.createUI();
+                this.createTimer();
+                this.createMiniGameBtn();
+            }
+
+            onPointerDown(pointer) {
+                const bounds = this.barrel.getBounds();
+                if (bounds.contains(pointer.x, pointer.y)) {
+                    this.dragging = true;
+                    this.dragStartY = pointer.y;
+                    this.initialAngle = this.angle;
+                }
+            }
+
+            onPointerMove(pointer) {
+                if (this.dragging) {
+                    const delta = pointer.y - this.dragStartY;
+                    this.angle = Phaser.Math.Clamp(this.initialAngle + delta * 0.005, -1.2, 0.8);
+                    this.updateBarrel();
+                    this.updateFireBtn();
+                }
+            }
+
+            onPointerUp() {
+                this.dragging = false;
+            }
+
+            addPowder(amount) {
+                if (!this.state.active) return;
+                this.state.powder = Math.min(this.state.powder + amount, this.state.maxPowder);
+                this.powderTxt.setText(`Powder: ${Math.round(this.state.powder)}%`);
+            }
+
+            setBall(size) {
+                if (!this.state.active) return;
+                this.state.ballSize = size;
+                Object.keys(this.ballBtns).forEach(s => {
+                    this.ballBtns[s].clear();
+                    this.ballBtns[s].fillStyle(this.state.ballSize === s ? 0xFFD700 : 0xC0C0C0);
+                    this.ballBtns[s].fillCircle(this.ballBtns[s].x, this.ballBtns[s].y, 25);
+                });
+                this.ballTxt.setText(`Ball: ${this.state.ballSize.toUpperCase()}`);
+            }
+
+            fire() {
+                if (!this.state.active || this.state.powder <= 0) return;
+
+                const cfg = CANNONBALLS[this.state.ballSize];
+                const l = 80;
+                const sx = 140 + Math.cos(this.angle) * l;
+                const sy = 500 + Math.sin(this.angle) * l;
+                const power = this.state.powder / 100;
+                const velocity = power * 600;
+
+                const ball = this.add.graphics();
+                ball.fillStyle(cfg.color);
+                ball.fillCircle(0, 0, cfg.radius);
+                ball.setPosition(sx, sy);
+
+                this.physics.add.existing(ball);
+                ball.body.setCircle(cfg.radius);
+                ball.body.setMass(cfg.mass);
+                ball.body.setDrag(cfg.drag);
+                ball.body.setVelocity(
+                    Math.cos(this.angle) * velocity,
+                    Math.sin(this.angle) * velocity
+                );
+
+                ball.damage = cfg.damage * power;
+
+                this.state.powder = 0;
+                this.powderTxt.setText('Powder: 0%');
+                this.fireBtn.setVisible(false);
+
+                // Muzzle flash
+                const flash = this.add.graphics();
+                flash.fillStyle(0xFFFF00, 0.8);
+                flash.fillCircle(sx, sy, 15);
+                this.tweens.add({targets:flash, radius:0, alpha:0, duration:200, onComplete:()=>flash.destroy()});
+
+                // Collision
+                this.physics.add.collider(ball, this.castle.parts, (b,p) => this.hitCastle(b));
+                this.physics.add.collider(ball, this.physics.world.bounds, () => {
+                    const dust = this.add.graphics();
+                    dust.fillStyle(0x8B4513, 0.7);
+                    dust.fillEllipse(b.x, b.y, 25, 15);
+                    this.tweens.add({targets:dust, alpha:0, scale:1.5, duration:300, onComplete:()=>dust.destroy()});
+                    b.destroy();
+                });
+
+                this.time.delayedCall(500, () => this.updateFireBtn());
+            }
+
+            hitCastle(ball) {
+                this.castle.takeDamage(ball.damage);
+                const hit = this.add.graphics();
+                hit.fillStyle(0xFF4500, 0.8);
+                hit.fillCircle(ball.x, ball.y, 10);
+                this.tweens.add({targets:hit, radius:25, alpha:0, duration:200, onComplete:()=>hit.destroy()});
+                ball.destroy();
+                this.state.score += Math.floor(ball.damage * 0.5);
+                this.scoreTxt.setText(`Score: ${this.state.score}`);
+            }
+        }
+
+        // ========== CASTLE CLASS ==========
+        class Castle {
+            constructor(scene, type) {
+                this.scene = scene;
+                this.type = type;
+                this.health = 100 * type.difficulty;
+                this.maxHealth = this.health;
+                this.x = 600;
+                this.y = 300;
+                this.parts = [];
+                this.create();
+            }
+
+            create() {
+                const castle = this.type.draw(this.scene, this.x, this.y);
+                this.parts.push(castle);
+
+                // Health bar
+                this.hpBg = this.scene.add.graphics();
+                this.hpBg.fillStyle(0x000000, 0.5);
+                this.hpBg.fillRoundedRect(this.x - 50, this.y - 150, 100, 10, 5);
+                this.hpBar = this.scene.add.graphics();
+                this.hpBar.fillStyle(0x00FF00);
+                this.hpBar.fillRoundedRect(this.x - 50, this.y - 150, 100, 10, 5);
+            }
+
+            takeDamage(dmg) {
+                this.health -= dmg;
+                const p = (this.health / this.maxHealth) * 100;
+                this.hpBar.clear();
+                this.hpBar.fillStyle(p < 30 ? 0xFF0000 : p < 60 ? 0xFFA500 : 0x00FF00);
+                this.hpBar.fillRoundedRect(this.x - 50, this.y - 150, p, 10, 5);
+
+                this.parts.forEach(p => {
+                    this.scene.tweens.add({targets:p, x:p.x+Phaser.Math.Between(-3,3), y:p.y+Phaser.Math.Between(-3,3), duration:50, yoyo:true});
+                });
+
+                if (this.health <= 0) this.destroy();
+            }
+
+            destroy() {
+                const main = this.scene.scene.getScene('MainScene');
+                if (main) {
+                    main.state.score += 100 * this.type.difficulty;
+                    main.state.castles++;
+                    main.scoreTxt.setText(`Score: ${main.state.score}`);
+                    main.castleTxt.setText(`Castles: ${main.state.castles}`);
+                    main.time.delayedCall(1000, () => {
+                        main.castleIdx = (main.castleIdx + 1) % CASTLES.length;
+                        main.castle.destroy();
+                        main.castle = new Castle(main, CASTLES[main.castleIdx]);
+                    });
+                }
+                this.parts.forEach(p => p.destroy());
+                this.hpBar.destroy();
+                this.hpBg.destroy();
+            }
+        }
+
+        // ========== INIT ==========
+        const game = new Phaser.Game(CONFIG);
+    </script>
+</body>
+</html>
