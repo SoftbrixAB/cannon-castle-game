@@ -412,7 +412,7 @@
                 this.powderBtn = this.add.graphics();
                 this.powderBtn.fillStyle(0x8B4513);
                 this.powderBtn.fillRect(20, 450, 40, 50);
-                this.powderBtn.setInteractive(new Phaser.Geom.Rectangle(0,0,40,50));
+                this.powderBtn.setInteractive();
                 this.powderBtn.on('pointerdown', () => this.addPowder(10));
                 this.add.text(40, 475, '💣');
 
@@ -422,7 +422,7 @@
                     const btn = this.add.graphics();
                     btn.fillStyle(this.state.ballSize === s ? 0xFFD700 : 0xC0C0C0);
                     btn.fillCircle(x, 550, 25);
-                    btn.setInteractive(new Phaser.Geom.Circle(x,550,25));
+                    btn.setInteractive();
                     btn.on('pointerdown', () => this.setBall(s));
                     this.add.text(x, 550, CANNONBALLS[s].label, {font:'20px Arial',fill:'#000'}).setOrigin(0.5);
                     this.ballBtns[s] = btn;
@@ -431,7 +431,7 @@
                 this.fireBtn = this.add.graphics();
                 this.fireBtn.fillStyle(0xFF4500);
                 this.fireBtn.fillCircle(0, 0, 25);
-                this.fireBtn.setInteractive(new Phaser.Geom.Circle(0,0,25));
+                this.fireBtn.setInteractive();
                 this.fireBtn.on('pointerdown', () => this.fire());
                 this.fireBtn.setVisible(false);
                 this.updateFireBtn();
@@ -492,7 +492,7 @@
                 const btn = this.add.graphics();
                 btn.fillStyle(0x4CAF50);
                 btn.fillRoundedRect(750, 550, 120, 40, 5);
-                btn.setInteractive(new Phaser.Geom.Rectangle(0,0,120,40));
+                btn.setInteractive();
                 btn.on('pointerdown', () => this.startMiniGame());
                 this.add.text(750, 550, 'Mini-Game', {font:'16px Arial',fill:'#fff'}).setOrigin(0.5);
             }
@@ -517,7 +517,7 @@
                     const btn = this.add.graphics();
                     btn.fillStyle(0x3498DB);
                     btn.fillRoundedRect(400, 280+i*60, 500, 40, 5);
-                    btn.setInteractive(new Phaser.Geom.Rectangle(0,0,500,40));
+                    btn.setInteractive();
                     btn.on('pointerdown', () => this.checkAnswer(i, q.correct, btn));
                     this.add.text(400, 280+i*60, a, {font:'18px Arial',fill:'#fff',wordWrap:{width:480}}).setOrigin(0.5);
                 });
@@ -525,7 +525,7 @@
                 const back = this.add.graphics();
                 back.fillStyle(0xF44336);
                 back.fillRoundedRect(750, 550, 120, 40, 5);
-                back.setInteractive(new Phaser.Geom.Rectangle(0,0,120,40));
+                back.setInteractive();
                 back.on('pointerdown', () => this.closeMiniGame());
                 this.add.text(750, 550, 'Back', {font:'16px Arial',fill:'#fff'}).setOrigin(0.5);
             }
