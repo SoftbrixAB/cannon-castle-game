@@ -229,7 +229,7 @@
                 
                 // Only create if one doesn't exist
                 if (typeof game === 'undefined') {
-                    const testGame = new Phaser.Game(testConfig);
+                    game = new Phaser.Game(testConfig);
                     console.log('Test game initialized successfully');
                 }
             } catch (e) {
@@ -247,10 +247,10 @@
             type: Phaser.AUTO,
             width: 800,
             height: 600,
-            parent: 'game',
+            parent: 'game-container',
             backgroundColor: '#87CEEB',
             physics: { default: 'arcade', arcade: { gravity: { y: 400 }, debug: false } },
-            scene: []
+            scene: [MainScene]
         };
 
         // ========== CANNONBALLS ==========
