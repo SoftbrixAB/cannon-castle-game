@@ -243,15 +243,7 @@
     <!-- Include the game code inline for testing -->
     <script>
         // ========== CONFIG ==========
-        const CONFIG = {
-            type: Phaser.AUTO,
-            width: 800,
-            height: 600,
-            parent: 'game-container',
-            backgroundColor: '#87CEEB',
-            physics: { default: 'arcade', arcade: { gravity: { y: 400 }, debug: false } },
-            scene: [MainScene]
-        };
+
 
         // ========== CANNONBALLS ==========
         const CANNONBALLS = {
@@ -364,7 +356,17 @@
                 this.state = {
                     score: 0, castles: 0, time: 120, maxTime: 120, active: true,
                     ballSize: 'medium', powder: 0, maxPowder: 100
-                };
+       
+        const CONFIG = {
+            type: Phaser.AUTO,
+            width: 800,
+            height: 600,
+            parent: 'game-container',
+            backgroundColor: '#87CEEB',
+            physics: { default: 'arcade', arcade: { gravity: { y: 400 }, debug: false } },
+            scene: [MainScene]
+        };
+         };
 
                 this.physics.world.setBounds(0, 0, 800, 600);
                 this.input.on('pointerdown', this.onPointerDown, this);
