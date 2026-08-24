@@ -2,17 +2,245 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Cannon Castle Game</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cannon Castle Game - Tests</title>
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.80.1/dist/phaser.min.js"></script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: #87CEEB; overflow: hidden; touch-action: none; user-select: none; }
-        #game { width: 100vw; height: 100vh; display: block; }
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f0f0f0; }
+        #test-results { margin-top: 20px; padding: 20px; background: white; border-radius: 5px; }
+        .test { margin: 10px 0; padding: 10px; border-left: 4px solid #ccc; }
+        .pass { border-left-color: #4CAF50; background: #e8f5e9; }
+        .fail { border-left-color: #f44336; background: #ffebee; }
+        .skip { border-left-color: #ff9800; background: #fff3e0; }
+        #game-container { width: 800px; height: 600px; margin: 20px 0; }
     </style>
 </head>
 <body>
-    <div id="game"></div>
+    <h1>Cannon Castle Game - Test Suite</h1>
+    
+    <h2>Manual Test: Game Loading</h2>
+    <div id="game-container"></div>
+    
+    <h2>Test Results</h2>
+    <div id="test-results"></div>
+    
+    <script>
+        // Test framework
+        class TestFramework {
+            constructor() {
+                this.tests = [];
+                this.results = [];
+            }
+            
+            addTest(name, fn) {
+                this.tests.push({ name, fn });
+            }
+            
+            async run() {
+                const resultsDiv = document.getElementById('test-results');
+                resultsDiv.innerHTML = '<h3>Running tests...</h3>';
+                
+                for (const test of this.tests) {
+                    try {
+                        await test.fn();
+                        this.results.push({ name: test.name, status: 'pass' });
+                        resultsDiv.innerHTML += `<div class="test pass">✓ ${test.name}</div>`;
+                    } catch (e) {
+                        this.results.push({ name: test.name, status: 'fail', error: e.message });
+                        resultsDiv.innerHTML += `<div class="test fail">✗ ${test.name}: ${e.message}</div>`;
+                    }
+                }
+                
+                const passed = this.results.filter(r => r.status === 'pass').length;
+                const failed = this.results.filter(r => r.status === 'fail').length;
+                resultsDiv.innerHTML += `<hr><p><strong>Results: ${passed} passed, ${failed} failed</strong></p>`;
+            }
+        }
+        
+        const tests = new TestFramework();
+        
+        // Test 1: Phaser is loaded
+        tests.addTest('Phaser library is loaded', () => {
+            if (typeof Phaser === 'undefined') {
+                throw new Error('Phaser is not loaded');
+            }
+            if (typeof Phaser.Game !== 'function') {
+                throw new Error('Phaser.Game is not a function');
+            }
+        });
+        
+        // Test 2: Game configuration is valid
+        tests.addTest('Game configuration is valid', () => {
+            if (typeof CONFIG === 'undefined') {
+                throw new Error('CONFIG is not defined');
+            }
+            if (!CONFIG.scene || !CONFIG.scene.length) {
+                throw new Error('CONFIG.scene is empty');
+            }
+            if (typeof MainScene === 'undefined') {
+                throw new Error('MainScene class is not defined');
+            }
+        });
+        
+        // Test 3: Castle types are defined
+        tests.addTest('Castle types are defined', () => {
+            if (typeof CASTLES === 'undefined' || !CASTLES.length) {
+                throw new Error('CASTLES array is not defined or empty');
+            }
+            for (const castle of CASTLES) {
+                if (!castle.name || !castle.draw || !castle.difficulty) {
+                    throw new Error(`Castle ${castle.name} is missing required properties`);
+                }
+            }
+        });
+        
+        // Test 4: Cannonball configurations are defined
+        tests.addTest('Cannonball configurations are defined', () => {
+            if (typeof CANNONBALLS === 'undefined') {
+                throw new Error('CANNONBALLS is not defined');
+            }
+            const expectedSizes = ['small', 'medium', 'large'];
+            for (const size of expectedSizes) {
+                if (!CANNONBALLS[size]) {
+                    throw new Error(`Cannonball size ${size} is not defined`);
+                }
+                const cfg = CANNONBALLS[size];
+                if (typeof cfg.radius !== 'number' || typeof cfg.damage !== 'number') {
+                    throw new Error(`Cannonball ${size} has invalid configuration`);
+                }
+            }
+        });
+        
+        // Test 5: Mini-games are defined
+        tests.addTest('Mini-games are defined', () => {
+            if (typeof MINI_GAMES === 'undefined' || !MINI_GAMES.length) {
+                throw new Error('MINI_GAMES array is not defined or empty');
+            }
+            for (const game of MINI_GAMES) {
+                if (!game.id || !game.name) {
+                    throw new Error(`Mini-game is missing required properties`);
+                }
+            }
+        });
+        
+        // Test 6: Trivia questions are defined
+        tests.addTest('Trivia questions are defined', () => {
+            if (typeof TRIVIA === 'undefined' || !TRIVIA.length) {
+                throw new Error('TRIVIA array is not defined or empty');
+            }
+            for (const q of TRIVIA) {
+                if (!q.q || !q.a || q.correct === undefined) {
+                    throw new Error('Trivia question is missing required properties');
+                }
+                if (q.a.length < 2) {
+                    throw new Error('Trivia question has less than 2 answers');
+                }
+            }
+        });
+        
+        // Test 7: Castle class can be instantiated (requires mocking)
+        tests.addTest('Castle class structure is valid', () => {
+            if (typeof Castle !== 'function') {
+                throw new Error('Castle class is not defined');
+            }
+            const castleMethods = ['create', 'takeDamage', 'destroy'];
+            for (const method of castleMethods) {
+                if (typeof Castle.prototype[method] !== 'function') {
+                    throw new Error(`Castle class is missing method: ${method}`);
+                }
+            }
+        });
+        
+        // Test 8: MainScene class structure is valid
+        tests.addTest('MainScene class structure is valid', () => {
+            if (typeof MainScene !== 'function') {
+                throw new Error('MainScene class is not defined');
+            }
+            const sceneMethods = [
+                'create', 'createBG', 'createCastle', 'createCannon', 
+                'createUI', 'createTimer', 'createMiniGameBtn',
+                'fire', 'hitCastle', 'addPowder', 'setBall',
+                'onPointerDown', 'onPointerMove', 'onPointerUp',
+                'updateBarrel', 'updateFireBtn', 'formatTime',
+                'startMiniGame', 'showTrivia', 'checkAnswer', 'closeMiniGame'
+            ];
+            for (const method of sceneMethods) {
+                if (typeof MainScene.prototype[method] !== 'function') {
+                    throw new Error(`MainScene class is missing method: ${method}`);
+                }
+            }
+        });
+        
+        // Test 9: Game initialization
+        tests.addTest('Game can be initialized', () => {
+            if (typeof game === 'undefined') {
+                throw new Error('Game instance is not created');
+            }
+            // Note: We can't fully test this without a proper DOM element
+        });
+        
+        // Test 10: Utility functions
+        tests.addTest('Utility functions work correctly', () => {
+            // Test formatTime
+            if (typeof MainScene.prototype.formatTime !== 'function') {
+                throw new Error('formatTime method not found');
+            }
+            
+            // Create a mock instance to test
+            const mockScene = {
+                formatTime: MainScene.prototype.formatTime
+            };
+            
+            const result1 = mockScene.formatTime(90);
+            if (result1 !== '1:30') {
+                throw new Error(`formatTime(90) returned ${result1}, expected 1:30`);
+            }
+            
+            const result2 = mockScene.formatTime(65);
+            if (result2 !== '1:05') {
+                throw new Error(`formatTime(65) returned ${result2}, expected 1:05`);
+            }
+            
+            const result3 = mockScene.formatTime(45);
+            if (result3 !== '0:45') {
+                throw new Error(`formatTime(45) returned ${result3}, expected 0:45`);
+            }
+        });
+        
+        // Run tests after a delay to allow Phaser to load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                tests.run();
+            }, 1000);
+        });
+        
+        // Also try to initialize a test game
+        window.addEventListener('load', () => {
+            try {
+                const testConfig = {
+                    type: Phaser.AUTO,
+                    width: 800,
+                    height: 600,
+                    parent: 'game-container',
+                    backgroundColor: '#87CEEB',
+                    physics: { default: 'arcade', arcade: { gravity: { y: 400 }, debug: false } },
+                    scene: [MainScene]
+                };
+                
+                // Only create if one doesn't exist
+                if (typeof game === 'undefined') {
+                    const testGame = new Phaser.Game(testConfig);
+                    console.log('Test game initialized successfully');
+                }
+            } catch (e) {
+                console.error('Failed to initialize test game:', e);
+                document.getElementById('test-results').innerHTML += 
+                    `<div class="test fail">✗ Game initialization failed: ${e.message}</div>`;
+            }
+        });
+    </script>
+    
+    <!-- Include the game code inline for testing -->
     <script>
         // ========== CONFIG ==========
         const CONFIG = {
@@ -22,7 +250,7 @@
             parent: 'game',
             backgroundColor: '#87CEEB',
             physics: { default: 'arcade', arcade: { gravity: { y: 400 }, debug: false } },
-            scene: [MainScene]
+            scene: []
         };
 
         // ========== CANNONBALLS ==========
@@ -40,14 +268,10 @@
                 difficulty: 1.2,
                 draw: function(scene, x, y) {
                     const g = scene.add.graphics();
-                    
-                    // Main tower
                     g.fillStyle(this.colors.stone, 1);
                     g.fillRect(x, y - 200, 80, 200);
                     g.lineStyle(2, this.colors.detail);
                     g.strokeRect(x, y - 200, 80, 200);
-                    
-                    // Conical roof
                     g.fillStyle(this.colors.roof, 1);
                     g.beginPath();
                     g.moveTo(x - 5, y - 200);
@@ -55,13 +279,9 @@
                     g.lineTo(x + 85, y - 200);
                     g.closePath();
                     g.fillPath();
-                    
-                    // Side towers
                     g.fillStyle(this.colors.stone, 1);
                     g.fillRect(x - 80, y - 120, 60, 120);
                     g.fillRect(x + 80, y - 120, 60, 120);
-                    
-                    // Pointed roofs
                     g.fillStyle(this.colors.roof, 1);
                     g.beginPath();
                     g.moveTo(x - 80, y - 120);
@@ -75,18 +295,13 @@
                     g.lineTo(x + 140, y - 120);
                     g.closePath();
                     g.fillPath();
-                    
-                    // Walls
                     g.fillStyle(this.colors.stone, 1);
                     g.fillRect(x - 60, y - 60, 200, 30);
-                    
-                    // Windows
                     g.fillStyle(this.colors.window, 1);
                     for (let i = 0; i < 3; i++) {
                         g.fillRect(x + 10 + i * 20, y - 180 + i * 30, 10, 15);
                         g.fillRect(x + 40 + i * 20, y - 180 + i * 30, 10, 15);
                     }
-                    
                     return g;
                 }
             },
@@ -96,14 +311,10 @@
                 difficulty: 1.0,
                 draw: function(scene, x, y) {
                     const g = scene.add.graphics();
-                    
-                    // Main building (Baroque style)
                     g.fillStyle(this.colors.stone, 1);
                     g.fillRect(x - 100, y - 100, 200, 100);
                     g.lineStyle(2, this.colors.detail);
                     g.strokeRect(x - 100, y - 100, 200, 100);
-                    
-                    // Mansard roof
                     g.fillStyle(this.colors.roof, 1);
                     g.fillRect(x - 110, y - 100, 220, 20);
                     g.beginPath();
@@ -113,30 +324,21 @@
                     g.lineTo(x + 110, y - 100);
                     g.closePath();
                     g.fillPath();
-                    
-                    // Side wings
                     g.fillStyle(this.colors.stone, 1);
                     g.fillRect(x - 180, y - 60, 80, 60);
                     g.fillRect(x + 100, y - 60, 80, 60);
-                    
-                    // Decorative columns
                     g.fillStyle(this.colors.detail, 1);
                     for (let i = 0; i < 3; i++) {
                         g.fillRect(x - 80 + i * 40, y - 100, 5, 30);
                         g.fillRect(x - 85 + i * 40, y - 100, 15, 5);
                     }
-                    
-                    // Windows
                     g.fillStyle(this.colors.window, 1);
                     for (let i = 0; i < 5; i++) {
                         g.fillRect(x - 90 + i * 40, y - 80, 12, 18);
                         g.fillRect(x - 90 + i * 40, y - 40, 12, 18);
                     }
-                    
-                    // Gardens (simplified)
                     g.fillStyle(0x2E8B57, 0.4);
                     g.fillRect(x - 150, y, 300, 40);
-                    
                     return g;
                 }
             }
@@ -193,14 +395,12 @@
             }
 
             createCannon() {
-                // Base
                 const base = this.add.graphics();
                 base.fillStyle(0x5C4033);
                 base.fillRect(60, 490, 80, 30);
                 base.fillCircle(75, 520, 15);
                 base.fillCircle(125, 520, 15);
 
-                // Barrel
                 this.barrel = this.add.graphics();
                 this.barrel.fillStyle(0x2F4F4F);
                 this.barrel.fillRect(0, -10, 80, 20);
@@ -209,7 +409,6 @@
                 this.angle = -0.3;
                 this.updateBarrel();
 
-                // Powder bag
                 this.powderBtn = this.add.graphics();
                 this.powderBtn.fillStyle(0x8B4513);
                 this.powderBtn.fillRect(20, 450, 40, 50);
@@ -217,7 +416,6 @@
                 this.powderBtn.on('pointerdown', () => this.addPowder(10));
                 this.add.text(40, 475, '💣');
 
-                // Ball size buttons
                 this.ballBtns = {};
                 ['small','medium','large'].forEach((s,i) => {
                     const x = 150 + i * 60;
@@ -230,7 +428,6 @@
                     this.ballBtns[s] = btn;
                 });
 
-                // Fire button
                 this.fireBtn = this.add.graphics();
                 this.fireBtn.fillStyle(0xFF4500);
                 this.fireBtn.fillCircle(0, 0, 25);
@@ -302,12 +499,11 @@
 
             startMiniGame() {
                 this.state.active = false;
-                const games = [MINI_GAMES[0]]; // Just trivia for now
+                const games = [MINI_GAMES[0]];
                 this.showTrivia(games[0]);
             }
 
             showTrivia(game) {
-                // Overlay
                 this.overlay = this.add.graphics();
                 this.overlay.fillStyle(0x000000, 0.8);
                 this.overlay.fillRect(0, 0, 800, 600);
@@ -339,7 +535,7 @@
                     btn.fillStyle(0x2ECC71);
                     this.time.delayedCall(1000, () => {
                         this.closeMiniGame();
-                        this.state.time += 15; // Add 15 seconds
+                        this.state.time += 15;
                         this.state.active = true;
                     });
                 } else {
@@ -426,13 +622,11 @@
                 this.powderTxt.setText('Powder: 0%');
                 this.fireBtn.setVisible(false);
 
-                // Muzzle flash
                 const flash = this.add.graphics();
                 flash.fillStyle(0xFFFF00, 0.8);
                 flash.fillCircle(sx, sy, 15);
                 this.tweens.add({targets:flash, radius:0, alpha:0, duration:200, onComplete:()=>flash.destroy()});
 
-                // Collision
                 this.physics.add.collider(ball, this.castle.parts, (b,p) => this.hitCastle(b));
                 this.physics.add.collider(ball, this.physics.world.bounds, () => {
                     const dust = this.add.graphics();
@@ -474,7 +668,6 @@
                 const castle = this.type.draw(this.scene, this.x, this.y);
                 this.parts.push(castle);
 
-                // Health bar
                 this.hpBg = this.scene.add.graphics();
                 this.hpBg.fillStyle(0x000000, 0.5);
                 this.hpBg.fillRoundedRect(this.x - 50, this.y - 150, 100, 10, 5);
@@ -515,11 +708,6 @@
                 this.hpBg.destroy();
             }
         }
-
-        // ========== INIT ==========
-        window.addEventListener("load", () => {
-            const game = new Phaser.Game(CONFIG);
-        });
     </script>
 </body>
 </html>
