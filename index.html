@@ -14,17 +14,6 @@
 <body>
     <div id="game"></div>
     <script>
-        // ========== CONFIG ==========
-        const CONFIG = {
-            type: Phaser.AUTO,
-            width: 800,
-            height: 600,
-            parent: 'game',
-            backgroundColor: '#87CEEB',
-            physics: { default: 'arcade', arcade: { gravity: { y: 400 }, debug: false } },
-            scene: [MainScene]
-        };
-
         // ========== CANNONBALLS ==========
         const CANNONBALLS = {
             small: { radius: 8, damage: 10, mass: 1, color: 0x333333, drag: 0.98, label: 'S' },
@@ -515,7 +504,22 @@
             }
         }
 
-        // ========== INIT ==========
+        
+
+// ========== CONFIG ==========
+        const CONFIG = {
+            type: Phaser.AUTO,
+            width: 800,
+            height: 600,
+            parent: 'game',
+            backgroundColor: '#87CEEB',
+            physics: { default: 'arcade', arcade: { gravity: { y: 400 }, debug: false } },
+            scene: [MainScene]
+        };
+
+        
+
+// ========== INIT ==========
         window.addEventListener("load", () => {
             const game = new Phaser.Game(CONFIG);
         });
