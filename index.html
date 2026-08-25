@@ -346,20 +346,15 @@
             }
 
             onPointerDown(pointer) {
-                // Check if pointer is near the barrel (left end at 140,500, length 80, height 20)
-                const barrelX = 140;
-                const barrelY = 500;
-                const barrelLength = 80;
-                const barrelHeight = 20;
-                // Calculate rotated position of barrel end
-                const endX = barrelX + Math.cos(this.angle) * barrelLength;
-                const endY = barrelY + Math.sin(this.angle) * barrelLength;
-                // Create a rectangle from (140,490) to (endX, endY+20) - barrel bounds
-                const minX = Math.min(barrelX, endX);
-                const maxX = Math.max(barrelX, endX);
-                const minY = Math.min(barrelY - 10, endY - 10);
-                const maxY = Math.max(barrelY + 10, endY + 10);
-                if (pointer.x >= minX && pointer.x <= maxX && pointer.y >= minY && pointer.y <= maxY) {
+                // Check if pointer is near the barrel area (140,480) to (220,520)
+                // This is a generous hit box that works regardless of barrel rotation
+                const barrelLeft = 140;
+                const barrelRight = 220;
+                const barrelTop = 480;
+                const barrelBottom = 520;
+                
+                if (pointer.x >= barrelLeft && pointer.x <= barrelRight && 
+                    pointer.y >= barrelTop && pointer.y <= barrelBottom) {
                     this.dragging = true;
                     this.dragStartY = pointer.y;
                     this.initialAngle = this.angle;

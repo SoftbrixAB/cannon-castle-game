@@ -783,6 +783,60 @@
             if (halfPowderVelocity !== 300) throw new Error('Half powder velocity should be 300');
             if (noPowderVelocity !== 0) throw new Error('No powder velocity should be 0');
         });
+        
+        // Test 21: Canvas click interaction (barrel dragging)
+        tests.addTest('Canvas click interaction works', () => {
+            // This test verifies that the onPointerDown method exists and can be called
+            if (typeof MainScene.prototype.onPointerDown !== 'function') {
+                throw new Error('onPointerDown method not found');
+            }
+            
+            // Create a mock scene to test the click handler
+            const mockScene = {
+                dragging: false,
+                dragStartY: 0,
+                initialAngle: -0.3,
+                angle: -0.3,
+                barrel: { x: 140, y: 500 },
+                onPointerDown: MainScene.prototype.onPointerDown,
+                onPointerMove: MainScene.prototype.onPointerMove,
+                onPointerUp: MainScene.prototype.onPointerUp,
+                updateBarrel: () => {},
+                updateFireBtn: () => {}
+            };
+            
+            // Simulate a click on the barrel area (x=180, y=500)
+            const mockPointer = { x: 180, y: 500 };
+            mockScene.onPointerDown(mockPointer);
+            
+            if (!mockScene.dragging) {
+                throw new Error('Dragging should be true after clicking barrel');
+            }
+            
+            if (mockScene.dragStartY !== 500) {
+                throw new Error('dragStartY should be set to pointer.y');
+            }
+            
+            if (mockScene.initialAngle !== -0.3) {
+                throw new Error('initialAngle should be preserved');
+            }
+            
+            // Simulate dragging
+            const mockPointer2 = { x: 180, y: 450 };
+            mockScene.onPointerMove(mockPointer2);
+            
+            // Angle should have changed
+            if (mockScene.angle === -0.3) {
+                throw new Error('Angle should change when dragging');
+            }
+            
+            // Simulate release
+            mockScene.onPointerUp();
+            if (mockScene.dragging) {
+                throw new Error('Dragging should be false after pointer up');
+            }
+        });
+
 
         
         // Initialize test game
