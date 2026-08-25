@@ -3,128 +3,241 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Cannon Castle Game</title>
+    <title>Cannon Castle Game - Pixel Art</title>
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.80.1/dist/phaser.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: #87CEEB; overflow: hidden; touch-action: none; user-select: none; }
+        body { 
+            background: #0a0a1a; 
+            overflow: hidden; 
+            touch-action: none; 
+            user-select: none;
+            font-family: 'Press Start 2P', cursive;
+        }
         #game { width: 100vw; height: 100vh; display: block; }
+        /* Pixel art scaling - sharp edges */
+        #game canvas { 
+            image-rendering: pixelated;
+            image-rendering: -moz-crisp-edges;
+            image-rendering: crisp-edges;
+        }
     </style>
 </head>
 <body>
     <div id="game"></div>
     <script>
-        // ========== CANNONBALLS ==========
-        const CANNONBALLS = {
-            small: { radius: 8, damage: 10, mass: 1, color: 0x333333, drag: 0.98, label: 'S' },
-            medium: { radius: 12, damage: 25, mass: 2, color: 0x222222, drag: 0.96, label: 'M' },
-            large: { radius: 18, damage: 50, mass: 4, color: 0x111111, drag: 0.94, label: 'L' }
+        // ========== PIXEL ART COLOR PALETTE ==========
+        const PIXEL_COLORS = {
+            // Classic NES/SNES inspired palette
+            black: 0x0a0a1a,
+            darkGray: 0x2a2a3a,
+            gray: 0x4a4a5a,
+            lightGray: 0x6a6a7a,
+            white: 0xf0f0f0,
+            // Castle colors
+            stoneLight: 0xd4c6a8,
+            stoneMid: 0xa89478,
+            stoneDark: 0x786450,
+            stoneShadow: 0x504030,
+            // Roof colors
+            roofRed: 0xb83828,
+            roofBrown: 0x644828,
+            roofDark: 0x3c2818,
+            // Details
+            wood: 0x8c5c38,
+            woodDark: 0x5c3c24,
+            metal: 0x787888,
+            metalDark: 0x4a4a58,
+            // Accents
+            gold: 0xe8c878,
+            blue: 0x3864b8,
+            green: 0x288838,
+            // Ground
+            grass: 0x286428,
+            grassDark: 0x184418,
+            // Sky
+            skyLight: 0x88b8e8,
+            skyMid: 0x5888c8,
+            skyDark: 0x284888
         };
 
-        // ========== CASTLES ==========
+        // ========== CANNONBALLS (Pixel Art) ==========
+        const CANNONBALLS = {
+            small: { radius: 6, damage: 10, mass: 1, color: PIXEL_COLORS.metalDark, drag: 0.98, label: 'S' },
+            medium: { radius: 8, damage: 25, mass: 2, color: PIXEL_COLORS.metal, drag: 0.96, label: 'M' },
+            large: { radius: 10, damage: 50, mass: 4, color: PIXEL_COLORS.metal, drag: 0.94, label: 'L' }
+        };
+
+        // ========== CASTLES (Pixel Art) ==========
         const CASTLES = [
             {
-                name: 'Neuschwanstein',
-                colors: { stone: 0xE8D5B7, roof: 0x8B4513, detail: 0x5D4037, window: 0x2E7D32 },
+                name: 'Pixel Keep',
+                colors: {
+                    stone: PIXEL_COLORS.stoneMid,
+                    stoneLight: PIXEL_COLORS.stoneLight,
+                    stoneDark: PIXEL_COLORS.stoneDark,
+                    roof: PIXEL_COLORS.roofRed,
+                    roofDark: PIXEL_COLORS.roofDark,
+                    detail: PIXEL_COLORS.gold,
+                    window: PIXEL_COLORS.blue
+                },
                 difficulty: 1.2,
                 draw: function(scene, x, y) {
                     const g = scene.add.graphics();
                     
-                    // Main tower
+                    // Pixel art style - use integer coordinates for sharp edges
+                    // Main tower (pixel-perfect rectangle)
                     g.fillStyle(this.colors.stone, 1);
-                    g.fillRect(x, y - 200, 80, 200);
-                    g.lineStyle(2, this.colors.detail);
-                    g.strokeRect(x, y - 200, 80, 200);
+                    g.fillRect(x - 40, y - 160, 80, 160);
                     
-                    // Conical roof
+                    // Stone texture - horizontal lines
+                    g.fillStyle(this.colors.stoneDark, 1);
+                    for (let i = 0; i < 8; i++) {
+                        g.fillRect(x - 40, y - 160 + i * 20, 80, 2);
+                    }
+                    
+                    // Roof (pixel art conical shape)
                     g.fillStyle(this.colors.roof, 1);
                     g.beginPath();
-                    g.moveTo(x - 5, y - 200);
-                    g.lineTo(x + 40, y - 260);
-                    g.lineTo(x + 85, y - 200);
+                    g.moveTo(x - 40, y - 160);
+                    g.lineTo(x, y - 200);
+                    g.lineTo(x + 40, y - 160);
+                    g.closePath();
+                    g.fillPath();
+                    
+                    // Roof edge (darker)
+                    g.fillStyle(this.colors.roofDark, 1);
+                    g.beginPath();
+                    g.moveTo(x - 38, y - 158);
+                    g.lineTo(x, y - 196);
+                    g.lineTo(x + 38, y - 158);
                     g.closePath();
                     g.fillPath();
                     
                     // Side towers
                     g.fillStyle(this.colors.stone, 1);
-                    g.fillRect(x - 80, y - 120, 60, 120);
-                    g.fillRect(x + 80, y - 120, 60, 120);
+                    g.fillRect(x - 100, y - 80, 40, 80);
+                    g.fillRect(x + 60, y - 80, 40, 80);
                     
-                    // Pointed roofs
+                    // Side tower roofs (pointed)
                     g.fillStyle(this.colors.roof, 1);
                     g.beginPath();
-                    g.moveTo(x - 80, y - 120);
-                    g.lineTo(x - 50, y - 180);
-                    g.lineTo(x - 20, y - 120);
+                    g.moveTo(x - 100, y - 80);
+                    g.lineTo(x - 70, y - 120);
+                    g.lineTo(x - 60, y - 80);
                     g.closePath();
                     g.fillPath();
                     g.beginPath();
-                    g.moveTo(x + 80, y - 120);
-                    g.lineTo(x + 110, y - 180);
-                    g.lineTo(x + 140, y - 120);
+                    g.moveTo(x + 60, y - 80);
+                    g.lineTo(x + 90, y - 120);
+                    g.lineTo(x + 100, y - 80);
                     g.closePath();
                     g.fillPath();
                     
                     // Walls
                     g.fillStyle(this.colors.stone, 1);
-                    g.fillRect(x - 60, y - 60, 200, 30);
+                    g.fillRect(x - 60, y, 120, 20);
                     
-                    // Windows
+                    // Wall texture
+                    g.fillStyle(this.colors.stoneDark, 1);
+                    for (let i = 0; i < 6; i++) {
+                        g.fillRect(x - 60 + i * 20, y + 4, 10, 2);
+                        g.fillRect(x - 60 + i * 20 + 10, y + 12, 10, 2);
+                    }
+                    
+                    // Windows (pixel art)
                     g.fillStyle(this.colors.window, 1);
                     for (let i = 0; i < 3; i++) {
-                        g.fillRect(x + 10 + i * 20, y - 180 + i * 30, 10, 15);
-                        g.fillRect(x + 40 + i * 20, y - 180 + i * 30, 10, 15);
+                        g.fillRect(x - 30 + i * 20, y - 120, 8, 8);
+                        g.fillRect(x - 30 + i * 20, y - 80, 8, 8);
+                    }
+                    
+                    // Door
+                    g.fillStyle(this.colors.wood, 1);
+                    g.fillRect(x - 10, y + 20, 20, 30);
+                    g.fillStyle(this.colors.woodDark, 1);
+                    g.fillRect(x - 8, y + 22, 16, 2);
+                    g.fillRect(x - 8, y + 26, 16, 2);
+                    g.fillRect(x - 8, y + 30, 16, 2);
+                    
+                    // Battlements (pixel art)
+                    g.fillStyle(this.colors.stoneLight, 1);
+                    for (let i = 0; i < 6; i++) {
+                        g.fillRect(x - 60 + i * 20, y - 20, 8, 20);
                     }
                     
                     return g;
                 }
             },
             {
-                name: 'Schönbrunn',
-                colors: { stone: 0xF5E6D3, roof: 0x4E342E, detail: 0x3E2723, window: 0x1B5E20 },
+                name: 'Block Fortress',
+                colors: {
+                    stone: PIXEL_COLORS.stoneLight,
+                    stoneDark: PIXEL_COLORS.stoneMid,
+                    roof: PIXEL_COLORS.roofBrown,
+                    roofDark: PIXEL_COLORS.roofDark,
+                    detail: PIXEL_COLORS.gold,
+                    window: PIXEL_COLORS.green
+                },
                 difficulty: 1.0,
                 draw: function(scene, x, y) {
                     const g = scene.add.graphics();
                     
-                    // Main building (Baroque style)
+                    // Main building (blocky pixel art)
                     g.fillStyle(this.colors.stone, 1);
-                    g.fillRect(x - 100, y - 100, 200, 100);
-                    g.lineStyle(2, this.colors.detail);
-                    g.strokeRect(x - 100, y - 100, 200, 100);
+                    g.fillRect(x - 100, y - 80, 200, 80);
                     
-                    // Mansard roof
-                    g.fillStyle(this.colors.roof, 1);
-                    g.fillRect(x - 110, y - 100, 220, 20);
-                    g.beginPath();
-                    g.moveTo(x - 110, y - 100);
-                    g.lineTo(x - 120, y - 120);
-                    g.lineTo(x + 120, y - 120);
-                    g.lineTo(x + 110, y - 100);
-                    g.closePath();
-                    g.fillPath();
-                    
-                    // Side wings
-                    g.fillStyle(this.colors.stone, 1);
-                    g.fillRect(x - 180, y - 60, 80, 60);
-                    g.fillRect(x + 100, y - 60, 80, 60);
-                    
-                    // Decorative columns
-                    g.fillStyle(this.colors.detail, 1);
-                    for (let i = 0; i < 3; i++) {
-                        g.fillRect(x - 80 + i * 40, y - 100, 5, 30);
-                        g.fillRect(x - 85 + i * 40, y - 100, 15, 5);
+                    // Stone texture
+                    g.fillStyle(this.colors.stoneDark, 1);
+                    for (let i = 0; i < 10; i++) {
+                        g.fillRect(x - 100 + i * 20, y - 80 + 4, 10, 2);
+                        g.fillRect(x - 100 + i * 20 + 10, y - 80 + 12, 10, 2);
+                        g.fillRect(x - 100 + i * 20, y - 80 + 20, 10, 2);
+                        g.fillRect(x - 100 + i * 20 + 10, y - 80 + 28, 10, 2);
                     }
+                    
+                    // Flat roof
+                    g.fillStyle(this.colors.roof, 1);
+                    g.fillRect(x - 110, y - 80, 220, 10);
+                    
+                    // Roof edge
+                    g.fillStyle(this.colors.roofDark, 1);
+                    g.fillRect(x - 110, y - 80, 220, 2);
+                    
+                    // Side towers (square)
+                    g.fillStyle(this.colors.stone, 1);
+                    g.fillRect(x - 140, y - 40, 40, 40);
+                    g.fillRect(x + 100, y - 40, 40, 40);
+                    
+                    // Tower roofs
+                    g.fillStyle(this.colors.roof, 1);
+                    g.fillRect(x - 140, y - 40, 40, 5);
+                    g.fillRect(x + 100, y - 40, 40, 5);
                     
                     // Windows
                     g.fillStyle(this.colors.window, 1);
                     for (let i = 0; i < 5; i++) {
-                        g.fillRect(x - 90 + i * 40, y - 80, 12, 18);
-                        g.fillRect(x - 90 + i * 40, y - 40, 12, 18);
+                        g.fillRect(x - 90 + i * 40, y - 60, 10, 10);
+                        g.fillRect(x - 90 + i * 40, y - 30, 10, 10);
                     }
                     
-                    // Gardens (simplified)
-                    g.fillStyle(0x2E8B57, 0.4);
-                    g.fillRect(x - 150, y, 300, 40);
+                    // Decorative blocks
+                    g.fillStyle(this.colors.detail, 1);
+                    g.fillRect(x - 100, y - 80, 10, 10);
+                    g.fillRect(x + 90, y - 80, 10, 10);
+                    g.fillRect(x - 100, y + 0, 10, 10);
+                    g.fillRect(x + 90, y + 0, 10, 10);
+                    
+                    // Gate
+                    g.fillStyle(this.colors.wood, 1);
+                    g.fillRect(x - 20, y + 0, 40, 20);
+                    g.fillStyle(this.colors.woodDark, 1);
+                    g.fillRect(x - 18, y + 2, 36, 2);
+                    g.fillRect(x - 18, y + 6, 36, 2);
+                    g.fillRect(x - 18, y + 10, 36, 2);
+                    g.fillRect(x - 18, y + 14, 36, 2);
+                    g.fillRect(x - 18, y + 18, 36, 2);
                     
                     return g;
                 }
@@ -133,13 +246,13 @@
 
         // ========== MINI-GAMES ==========
         const MINI_GAMES = [
-            { id: 'trivia', name: 'Castle Trivia', icon: '📚' },
-            { id: 'reflex', name: 'Quick Reflex', icon: '🎯' }
+            { id: 'trivia', name: 'Castle Trivia', icon: '\ud83d\udcda' },
+            { id: 'reflex', name: 'Quick Reflex', icon: '\ud83c\udfaf' }
         ];
 
         const TRIVIA = [
-            { q: "Which castle inspired Disney's Sleeping Beauty?", a: ["Neuschwanstein","Edinburgh","Himeji","Windsor"], correct: 0 },
-            { q: "Where is Schönbrunn Palace?", a: ["Germany","Austria","France","Italy"], correct: 1 },
+            { q: "Which castle inspired Disney\'s Sleeping Beauty?", a: ["Neuschwanstein","Edinburgh","Himeji","Windsor"], correct: 0 },
+            { q: "Where is Schonbrunn Palace?", a: ["Germany","Austria","France","Italy"], correct: 1 },
             { q: "What style is Neuschwanstein?", a: ["Baroque","Romanesque","Gothic Revival","Renaissance"], correct: 2 }
         ];
 
@@ -170,10 +283,38 @@
 
             createBG() {
                 const g = this.add.graphics();
-                g.fillGradientStyle(0x87CEEB, 0x87CEEB, 0xE0F7FF, 0xE0F7FF);
-                g.fillRect(0, 0, 800, 600);
-                g.fillStyle(0x228B22);
+                
+                // Pixel art sky - banded colors
+                g.fillStyle(PIXEL_COLORS.skyDark, 1);
+                g.fillRect(0, 0, 800, 200);
+                g.fillStyle(PIXEL_COLORS.skyMid, 1);
+                g.fillRect(0, 200, 800, 200);
+                g.fillStyle(PIXEL_COLORS.skyLight, 1);
+                g.fillRect(0, 400, 800, 100);
+                
+                // Pixel art clouds (simple rectangles)
+                g.fillStyle(PIXEL_COLORS.white, 0.8);
+                g.fillRect(100, 100, 60, 20);
+                g.fillRect(120, 80, 80, 20);
+                g.fillRect(140, 100, 60, 20);
+                g.fillRect(400, 150, 60, 20);
+                g.fillRect(420, 130, 80, 20);
+                g.fillRect(440, 150, 60, 20);
+                g.fillRect(600, 80, 60, 20);
+                g.fillRect(620, 60, 80, 20);
+                g.fillRect(640, 80, 60, 20);
+                
+                // Pixel art ground
+                g.fillStyle(PIXEL_COLORS.grass, 1);
                 g.fillRect(0, 500, 800, 100);
+                
+                // Grass texture
+                g.fillStyle(PIXEL_COLORS.grassDark, 1);
+                for (let i = 0; i < 80; i++) {
+                    if (Math.random() > 0.5) {
+                        g.fillRect(i * 10, 500 + Math.floor(Math.random() * 10), 10, 2);
+                    }
+                }
             }
 
             createCastle() {
@@ -182,46 +323,107 @@
             }
 
             createCannon() {
-                // Base
+                // Base (pixel art)
                 const base = this.add.graphics();
-                base.fillStyle(0x5C4033);
+                base.fillStyle(PIXEL_COLORS.wood, 1);
                 base.fillRect(60, 490, 80, 30);
+                
+                // Base texture
+                base.fillStyle(PIXEL_COLORS.woodDark, 1);
+                base.fillRect(62, 492, 76, 2);
+                base.fillRect(62, 496, 76, 2);
+                base.fillRect(62, 500, 76, 2);
+                base.fillRect(62, 504, 76, 2);
+                base.fillRect(62, 508, 76, 2);
+                
+                // Wheels
+                base.fillStyle(PIXEL_COLORS.black, 1);
                 base.fillCircle(75, 520, 15);
                 base.fillCircle(125, 520, 15);
+                
+                // Wheel details
+                base.fillStyle(PIXEL_COLORS.gray, 1);
+                base.fillCircle(75, 520, 8);
+                base.fillCircle(125, 520, 8);
+                
+                // Axles
+                base.fillStyle(PIXEL_COLORS.metalDark, 1);
+                base.fillRect(70, 515, 10, 10);
+                base.fillRect(120, 515, 10, 10);
 
-                // Barrel
+                // Barrel (pixel art)
                 this.barrel = this.add.graphics();
                 this.barrel.setPosition(140, 500);
-                this.barrel.fillStyle(0x2F4F4F);
-                this.barrel.fillRect(0, -10, 80, 20);
+                this.barrel.fillStyle(PIXEL_COLORS.metal, 1);
+                this.barrel.fillRect(0, -8, 80, 16);
+                
+                // Barrel texture
+                this.barrel.fillStyle(PIXEL_COLORS.metalDark, 1);
+                this.barrel.fillRect(2, -6, 76, 2);
+                this.barrel.fillRect(2, -2, 76, 2);
+                this.barrel.fillRect(2, 2, 76, 2);
+                
+                // Barrel end
+                this.barrel.fillStyle(PIXEL_COLORS.black, 1);
+                this.barrel.fillRect(76, -8, 4, 16);
+                
                 this.angle = -0.3;
                 this.updateBarrel();
 
-                // Powder bag
+                // Powder bag (pixel art)
                 this.powderBtn = this.add.graphics();
-                this.powderBtn.fillStyle(0x8B4513);
+                this.powderBtn.fillStyle(PIXEL_COLORS.roofBrown, 1);
                 this.powderBtn.fillRect(20, 450, 40, 50);
+                
+                // Powder bag texture
+                this.powderBtn.fillStyle(PIXEL_COLORS.roofDark, 1);
+                this.powderBtn.fillRect(22, 452, 36, 2);
+                this.powderBtn.fillRect(22, 456, 36, 2);
+                this.powderBtn.fillRect(22, 460, 36, 2);
+                this.powderBtn.fillRect(22, 464, 36, 2);
+                this.powderBtn.fillRect(22, 468, 36, 2);
+                this.powderBtn.fillRect(22, 472, 36, 2);
+                
+                // Powder bag tie
+                this.powderBtn.fillStyle(PIXEL_COLORS.gold, 1);
+                this.powderBtn.fillRect(30, 475, 20, 5);
+                
                 this.powderBtn.setInteractive();
                 this.powderBtn.on('pointerdown', () => this.addPowder(10));
-                this.add.text(40, 475, '💣');
-
-                // Ball size buttons
+                
+                // Powder icon (pixel art powder keg)
+                const powderIcon = this.add.graphics();
+                powderIcon.fillStyle(PIXEL_COLORS.roofBrown, 1);
+                powderIcon.fillRect(40, 475, 10, 10);
+                powderIcon.fillStyle(PIXEL_COLORS.roofDark, 1);
+                powderIcon.fillRect(42, 477, 6, 2);
+                
+                // Ball size buttons (pixel art)
                 this.ballBtns = {};
                 ['small','medium','large'].forEach((s,i) => {
                     const x = 150 + i * 60;
                     const btn = this.add.graphics();
-                    btn.fillStyle(this.state.ballSize === s ? 0xFFD700 : 0xC0C0C0);
-                    btn.fillCircle(x, 550, 25);
+                    btn.fillStyle(this.state.ballSize === s ? PIXEL_COLORS.gold : PIXEL_COLORS.gray, 1);
+                    btn.fillRect(x - 25, 540, 50, 20);
+                    btn.fillStyle(PIXEL_COLORS.black, 1);
+                    btn.fillRect(x - 23, 542, 46, 2);
+                    btn.fillRect(x - 23, 546, 46, 2);
+                    btn.fillRect(x - 23, 550, 46, 2);
+                    btn.fillRect(x - 23, 554, 46, 2);
                     btn.setInteractive();
                     btn.on('pointerdown', () => this.setBall(s));
-                    this.add.text(x, 550, CANNONBALLS[s].label, {font:'20px Arial',fill:'#000'}).setOrigin(0.5);
+                    this.add.text(x, 550, CANNONBALLS[s].label, {font:'12px "Press Start 2P"',fill:'#000'}).setOrigin(0.5);
                     this.ballBtns[s] = btn;
                 });
 
-                // Fire button
+                // Fire button (pixel art)
                 this.fireBtn = this.add.graphics();
-                this.fireBtn.fillStyle(0xFF4500);
-                this.fireBtn.fillCircle(0, 0, 25);
+                this.fireBtn.fillStyle(PIXEL_COLORS.gold, 1);
+                this.fireBtn.fillCircle(0, 0, 20);
+                this.fireBtn.fillStyle(PIXEL_COLORS.black, 1);
+                this.fireBtn.fillCircle(0, 0, 15);
+                this.fireBtn.fillStyle(PIXEL_COLORS.gold, 1);
+                this.fireBtn.fillCircle(0, 0, 10);
                 this.fireBtn.setInteractive();
                 this.fireBtn.on('pointerdown', () => this.fire());
                 this.fireBtn.setVisible(false);
@@ -241,21 +443,55 @@
             }
 
             createUI() {
-                this.scoreTxt = this.add.text(20, 20, `Score: ${this.state.score}`, {font:'20px Arial',fill:'#000'});
-                this.castleTxt = this.add.text(20, 50, `Castles: ${this.state.castles}`, {font:'20px Arial',fill:'#000'});
-                this.powderTxt = this.add.text(150, 430, `Powder: ${this.state.powder}%`, {font:'16px Arial',fill:'#000'}).setOrigin(0.5);
-                this.ballTxt = this.add.text(150, 460, `Ball: ${this.state.ballSize.toUpperCase()}`, {font:'16px Arial',fill:'#000'}).setOrigin(0.5);
+                // Score
+                this.scoreTxt = this.add.text(20, 20, `SCORE: ${this.state.score}`, {
+                    font:'14px "Press Start 2P"',
+                    fill:'#' + PIXEL_COLORS.gold.toString(16).padStart(6, '0')
+                });
+                
+                // Castles
+                this.castleTxt = this.add.text(20, 50, `CASTLES: ${this.state.castles}`, {
+                    font:'14px "Press Start 2P"',
+                    fill:'#' + PIXEL_COLORS.gold.toString(16).padStart(6, '0')
+                });
+                
+                // Powder
+                this.powderTxt = this.add.text(150, 430, `POWDER: ${Math.round(this.state.powder)}%`, {
+                    font:'12px "Press Start 2P"',
+                    fill:'#' + PIXEL_COLORS.white.toString(16).padStart(6, '0')
+                }).setOrigin(0.5);
+                
+                // Ball type
+                this.ballTxt = this.add.text(150, 460, `BALL: ${this.state.ballSize.toUpperCase()}`, {
+                    font:'12px "Press Start 2P"',
+                    fill:'#' + PIXEL_COLORS.white.toString(16).padStart(6, '0')
+                }).setOrigin(0.5);
             }
 
             createTimer() {
-                this.timerTxt = this.add.text(700, 20, this.formatTime(this.state.time), {font:'24px Arial',fill:'#000'});
+                this.timerTxt = this.add.text(700, 20, this.formatTime(this.state.time), {
+                    font:'18px "Press Start 2P"',
+                    fill:'#' + PIXEL_COLORS.gold.toString(16).padStart(6, '0')
+                });
+                
+                // Fire stick (pixel art)
                 this.fireStick = this.add.graphics();
-                this.fireStick.fillStyle(0xFF4500);
+                this.fireStick.fillStyle(PIXEL_COLORS.roofBrown, 1);
                 this.fireStick.fillRect(700, 50, 20, 120);
+                
+                // Fire stick texture
+                this.fireStick.fillStyle(PIXEL_COLORS.roofDark, 1);
+                for (let i = 0; i < 6; i++) {
+                    this.fireStick.fillRect(702, 52 + i * 20, 16, 2);
+                }
+                
+                // Fire burn indicator
                 this.fireBurn = this.add.graphics();
-                this.fireBurn.fillStyle(0xFF8C00);
+                this.fireBurn.fillStyle(PIXEL_COLORS.gold, 1);
                 this.fireBurn.fillRect(700, 50, 20, 0);
-                this.add.text(700, 80, '🔥');
+                
+                // Fire icon
+                this.add.text(700, 80, '\ud83d\udd25', {font:'20px Arial',fill:'#' + PIXEL_COLORS.gold.toString(16).padStart(6, '0')});
 
                 this.time.addEvent({delay:1000,callback:()=>{
                     if (!this.state.active) return;
@@ -268,7 +504,7 @@
                     this.timerTxt.setText(this.formatTime(this.state.time));
                     const p = (this.state.maxTime - this.state.time) / this.state.maxTime;
                     this.fireBurn.clear();
-                    this.fireBurn.fillStyle(this.state.time <= 10 ? 0xFF0000 : 0xFF8C00);
+                    this.fireBurn.fillStyle(this.state.time <= 10 ? 0xFF0000 : PIXEL_COLORS.gold, 1);
                     this.fireBurn.fillRect(700, 50, 20, 120 * p);
                 },loop:true});
             }
@@ -281,11 +517,17 @@
 
             createMiniGameBtn() {
                 const btn = this.add.graphics();
-                btn.fillStyle(0x4CAF50);
-                btn.fillRoundedRect(750, 550, 120, 40, 5);
+                btn.fillStyle(PIXEL_COLORS.roofBrown, 1);
+                btn.fillRoundedRect(750, 550, 120, 40, 2);
+                btn.fillStyle(PIXEL_COLORS.roofDark, 1);
+                btn.fillRoundedRect(752, 552, 116, 2, 2);
+                btn.fillRoundedRect(752, 556, 116, 2, 2);
+                btn.fillRoundedRect(752, 560, 116, 2, 2);
+                btn.fillRoundedRect(752, 564, 116, 2, 2);
+                btn.fillRoundedRect(752, 568, 116, 2, 2);
                 btn.setInteractive();
                 btn.on('pointerdown', () => this.startMiniGame());
-                this.add.text(750, 550, 'Mini-Game', {font:'16px Arial',fill:'#fff'}).setOrigin(0.5);
+                this.add.text(750, 550, 'MINI-GAME', {font:'12px "Press Start 2P"',fill:'#' + PIXEL_COLORS.white.toString(16).padStart(6, '0')}).setOrigin(0.5);
             }
 
             startMiniGame() {
@@ -297,41 +539,75 @@
             showTrivia(game) {
                 // Overlay
                 this.overlay = this.add.graphics();
-                this.overlay.fillStyle(0x000000, 0.8);
+                this.overlay.fillStyle(PIXEL_COLORS.black, 0.9);
                 this.overlay.fillRect(0, 0, 800, 600);
 
-                this.add.text(400, 100, game.name, {font:'32px Arial',fill:'#FFD700'}).setOrigin(0.5);
+                // Border
+                const border = this.add.graphics();
+                border.fillStyle(PIXEL_COLORS.gold, 1);
+                border.fillRect(100, 50, 600, 400);
+                border.fillStyle(PIXEL_COLORS.black, 1);
+                border.fillRect(102, 52, 596, 396);
+
+                this.add.text(400, 100, game.name, {
+                    font:'20px "Press Start 2P"',
+                    fill:'#' + PIXEL_COLORS.gold.toString(16).padStart(6, '0')
+                }).setOrigin(0.5);
                 
                 const q = TRIVIA[Math.floor(Math.random()*TRIVIA.length)];
-                this.add.text(400, 200, q.q, {font:'20px Arial',fill:'#fff',wordWrap:{width:600}}).setOrigin(0.5);
+                this.add.text(400, 200, q.q, {
+                    font:'14px "Press Start 2P"',
+                    fill:'#' + PIXEL_COLORS.white.toString(16).padStart(6, '0'),
+                    wordWrap:{width:580}
+                }).setOrigin(0.5);
 
                 q.a.forEach((a,i) => {
                     const btn = this.add.graphics();
-                    btn.fillStyle(0x3498DB);
-                    btn.fillRoundedRect(400, 280+i*60, 500, 40, 5);
+                    btn.fillStyle(PIXEL_COLORS.roofBrown, 1);
+                    btn.fillRoundedRect(400, 280+i*60, 500, 40, 2);
+                    btn.fillStyle(PIXEL_COLORS.roofDark, 1);
+                    btn.fillRoundedRect(402, 282+i*60, 496, 2, 2);
+                    btn.fillRoundedRect(402, 286+i*60, 496, 2, 2);
+                    btn.fillRoundedRect(402, 290+i*60, 496, 2, 2);
+                    btn.fillRoundedRect(402, 294+i*60, 496, 2, 2);
+                    btn.fillRoundedRect(402, 298+i*60, 496, 2, 2);
                     btn.setInteractive();
                     btn.on('pointerdown', () => this.checkAnswer(i, q.correct, btn));
-                    this.add.text(400, 280+i*60, a, {font:'18px Arial',fill:'#fff',wordWrap:{width:480}}).setOrigin(0.5);
+                    this.add.text(400, 280+i*60, a, {
+                        font:'12px "Press Start 2P"',
+                        fill:'#' + PIXEL_COLORS.white.toString(16).padStart(6, '0'),
+                        wordWrap:{width:480}
+                    }).setOrigin(0.5);
                 });
 
                 const back = this.add.graphics();
-                back.fillStyle(0xF44336);
-                back.fillRoundedRect(750, 550, 120, 40, 5);
+                back.fillStyle(PIXEL_COLORS.gold, 1);
+                back.fillRoundedRect(750, 550, 120, 40, 2);
+                back.fillStyle(PIXEL_COLORS.black, 1);
+                back.fillRoundedRect(752, 552, 116, 2, 2);
+                back.fillRoundedRect(752, 556, 116, 2, 2);
+                back.fillRoundedRect(752, 560, 116, 2, 2);
+                back.fillRoundedRect(752, 564, 116, 2, 2);
+                back.fillRoundedRect(752, 568, 116, 2, 2);
                 back.setInteractive();
                 back.on('pointerdown', () => this.closeMiniGame());
-                this.add.text(750, 550, 'Back', {font:'16px Arial',fill:'#fff'}).setOrigin(0.5);
+                this.add.text(750, 550, 'BACK', {font:'12px "Press Start 2P"',fill:'#000'}).setOrigin(0.5);
             }
 
             checkAnswer(selected, correct, btn) {
                 if (selected === correct) {
-                    btn.fillStyle(0x2ECC71);
+                    btn.clear();
+                    btn.fillStyle(0x00FF00, 1);
+                    btn.fillRoundedRect(400, btn.y, 500, 40, 2);
                     this.time.delayedCall(1000, () => {
                         this.closeMiniGame();
                         this.state.time += 15; // Add 15 seconds
                         this.state.active = true;
                     });
                 } else {
-                    btn.fillStyle(0xE74C3C);
+                    btn.clear();
+                    btn.fillStyle(0xFF0000, 1);
+                    btn.fillRoundedRect(400, btn.y, 500, 40, 2);
                     this.time.delayedCall(1000, () => this.closeMiniGame());
                 }
             }
@@ -346,19 +622,17 @@
             }
 
             onPointerDown(pointer) {
-                // Check if pointer is near the barrel (left end at 140,500, length 80, height 20)
+                // Check if pointer is near the barrel
                 const barrelX = 140;
                 const barrelY = 500;
                 const barrelLength = 80;
-                const barrelHeight = 20;
-                // Calculate rotated position of barrel end
+                const barrelHeight = 16;
                 const endX = barrelX + Math.cos(this.angle) * barrelLength;
                 const endY = barrelY + Math.sin(this.angle) * barrelLength;
-                // Create a rectangle from (140,490) to (endX, endY+20) - barrel bounds
                 const minX = Math.min(barrelX, endX);
                 const maxX = Math.max(barrelX, endX);
-                const minY = Math.min(barrelY - 10, endY - 10);
-                const maxY = Math.max(barrelY + 10, endY + 10);
+                const minY = Math.min(barrelY - 8, endY - 8);
+                const maxY = Math.max(barrelY + 8, endY + 8);
                 if (pointer.x >= minX && pointer.x <= maxX && pointer.y >= minY && pointer.y <= maxY) {
                     this.dragging = true;
                     this.dragStartY = pointer.y;
@@ -382,7 +656,7 @@
             addPowder(amount) {
                 if (!this.state.active) return;
                 this.state.powder = Math.min(this.state.powder + amount, this.state.maxPowder);
-                this.powderTxt.setText(`Powder: ${Math.round(this.state.powder)}%`);
+                this.powderTxt.setText(`POWDER: ${Math.round(this.state.powder)}%`);
             }
 
             setBall(size) {
@@ -390,10 +664,15 @@
                 this.state.ballSize = size;
                 Object.keys(this.ballBtns).forEach(s => {
                     this.ballBtns[s].clear();
-                    this.ballBtns[s].fillStyle(this.state.ballSize === s ? 0xFFD700 : 0xC0C0C0);
-                    this.ballBtns[s].fillCircle(this.ballBtns[s].x, this.ballBtns[s].y, 25);
+                    this.ballBtns[s].fillStyle(this.state.ballSize === s ? PIXEL_COLORS.gold : PIXEL_COLORS.gray, 1);
+                    this.ballBtns[s].fillRect(this.ballBtns[s].x - 25, 540, 50, 20);
+                    this.ballBtns[s].fillStyle(PIXEL_COLORS.black, 1);
+                    this.ballBtns[s].fillRect(this.ballBtns[s].x - 23, 542, 46, 2);
+                    this.ballBtns[s].fillRect(this.ballBtns[s].x - 23, 546, 46, 2);
+                    this.ballBtns[s].fillRect(this.ballBtns[s].x - 23, 550, 46, 2);
+                    this.ballBtns[s].fillRect(this.ballBtns[s].x - 23, 554, 46, 2);
                 });
-                this.ballTxt.setText(`Ball: ${this.state.ballSize.toUpperCase()}`);
+                this.ballTxt.setText(`BALL: ${this.state.ballSize.toUpperCase()}`);
             }
 
             fire() {
@@ -407,8 +686,13 @@
                 const velocity = power * 600;
 
                 const ball = this.add.graphics();
-                ball.fillStyle(cfg.color);
+                ball.fillStyle(cfg.color, 1);
                 ball.fillCircle(0, 0, cfg.radius);
+                
+                // Add pixel art shading
+                ball.fillStyle(PIXEL_COLORS.black, 0.3);
+                ball.fillCircle(2, 2, cfg.radius - 2);
+                
                 ball.setPosition(sx, sy);
 
                 this.physics.add.existing(ball);
@@ -423,20 +707,22 @@
                 ball.damage = cfg.damage * power;
 
                 this.state.powder = 0;
-                this.powderTxt.setText('Powder: 0%');
+                this.powderTxt.setText('POWDER: 0%');
                 this.fireBtn.setVisible(false);
 
-                // Muzzle flash
+                // Muzzle flash (pixel art)
                 const flash = this.add.graphics();
                 flash.fillStyle(0xFFFF00, 0.8);
-                flash.fillCircle(sx, sy, 15);
+                flash.fillCircle(sx, sy, 10);
+                flash.fillStyle(0xFF0000, 0.6);
+                flash.fillCircle(sx, sy, 5);
                 this.tweens.add({targets:flash, radius:0, alpha:0, duration:200, onComplete:()=>flash.destroy()});
 
                 // Collision
                 this.physics.add.collider(ball, this.castle.parts, (b,p) => this.hitCastle(b));
                 this.physics.add.collider(ball, this.physics.world.bounds, () => {
                     const dust = this.add.graphics();
-                    dust.fillStyle(0x8B4513, 0.7);
+                    dust.fillStyle(PIXEL_COLORS.roofBrown, 0.7);
                     dust.fillEllipse(b.x, b.y, 25, 15);
                     this.tweens.add({targets:dust, alpha:0, scale:1.5, duration:300, onComplete:()=>dust.destroy()});
                     b.destroy();
@@ -450,10 +736,12 @@
                 const hit = this.add.graphics();
                 hit.fillStyle(0xFF4500, 0.8);
                 hit.fillCircle(ball.x, ball.y, 10);
+                hit.fillStyle(0xFFFF00, 0.6);
+                hit.fillCircle(ball.x, ball.y, 5);
                 this.tweens.add({targets:hit, radius:25, alpha:0, duration:200, onComplete:()=>hit.destroy()});
                 ball.destroy();
                 this.state.score += Math.floor(ball.damage * 0.5);
-                this.scoreTxt.setText(`Score: ${this.state.score}`);
+                this.scoreTxt.setText(`SCORE: ${this.state.score}`);
             }
         }
 
@@ -474,21 +762,27 @@
                 const castle = this.type.draw(this.scene, this.x, this.y);
                 this.parts.push(castle);
 
-                // Health bar
+                // Health bar (pixel art)
                 this.hpBg = this.scene.add.graphics();
-                this.hpBg.fillStyle(0x000000, 0.5);
-                this.hpBg.fillRoundedRect(this.x - 50, this.y - 150, 100, 10, 5);
+                this.hpBg.fillStyle(PIXEL_COLORS.black, 1);
+                this.hpBg.fillRoundedRect(this.x - 50, this.y - 150, 100, 10, 2);
+                
                 this.hpBar = this.scene.add.graphics();
-                this.hpBar.fillStyle(0x00FF00);
-                this.hpBar.fillRoundedRect(this.x - 50, this.y - 150, 100, 10, 5);
+                this.hpBar.fillStyle(0x00FF00, 1);
+                this.hpBar.fillRoundedRect(this.x - 50, this.y - 150, 100, 10, 2);
+                
+                // Health bar border
+                this.hpBorder = this.scene.add.graphics();
+                this.hpBorder.fillStyle(PIXEL_COLORS.gold, 1);
+                this.hpBorder.fillRoundedRect(this.x - 52, this.y - 152, 104, 14, 2);
             }
 
             takeDamage(dmg) {
                 this.health -= dmg;
                 const p = (this.health / this.maxHealth) * 100;
                 this.hpBar.clear();
-                this.hpBar.fillStyle(p < 30 ? 0xFF0000 : p < 60 ? 0xFFA500 : 0x00FF00);
-                this.hpBar.fillRoundedRect(this.x - 50, this.y - 150, p, 10, 5);
+                this.hpBar.fillStyle(p < 30 ? 0xFF0000 : p < 60 ? 0xFFA500 : 0x00FF00, 1);
+                this.hpBar.fillRoundedRect(this.x - 50, this.y - 150, p, 10, 2);
 
                 this.parts.forEach(p => {
                     this.scene.tweens.add({targets:p, x:p.x+Phaser.Math.Between(-3,3), y:p.y+Phaser.Math.Between(-3,3), duration:50, yoyo:true});
@@ -502,8 +796,8 @@
                 if (main) {
                     main.state.score += 100 * this.type.difficulty;
                     main.state.castles++;
-                    main.scoreTxt.setText(`Score: ${main.state.score}`);
-                    main.castleTxt.setText(`Castles: ${main.state.castles}`);
+                    main.scoreTxt.setText(`SCORE: ${main.state.score}`);
+                    main.castleTxt.setText(`CASTLES: ${main.state.castles}`);
                     main.time.delayedCall(1000, () => {
                         main.castleIdx = (main.castleIdx + 1) % CASTLES.length;
                         main.castle.destroy();
@@ -513,6 +807,7 @@
                 this.parts.forEach(p => p.destroy());
                 this.hpBar.destroy();
                 this.hpBg.destroy();
+                this.hpBorder.destroy();
             }
         }
 
@@ -522,9 +817,10 @@
             width: 800,
             height: 600,
             parent: 'game',
-            backgroundColor: '#87CEEB',
+            backgroundColor: '#0a0a1a',
             physics: { default: 'arcade', arcade: { gravity: { y: 400 }, debug: false } },
-            scene: [MainScene]
+            scene: [MainScene],
+            pixelArt: true  // Enable pixel art rendering
         };
 
         // ========== INIT ==========
