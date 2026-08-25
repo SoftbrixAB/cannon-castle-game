@@ -3,41 +3,104 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Cannon Castle Game</title>
+    <title>Cannon Castle Game - Flat Design</title>
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.80.1/dist/phaser.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: #87CEEB; overflow: hidden; touch-action: none; user-select: none; }
+        body { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            overflow: hidden; 
+            touch-action: none; 
+            user-select: none;
+            font-family: 'Roboto', sans-serif;
+        }
         #game { width: 100vw; height: 100vh; display: block; }
+        
+        /* Smooth everything for flat design */
+        #game canvas { 
+            image-rendering: auto;
+        }
     </style>
 </head>
 <body>
     <div id="game"></div>
     <script>
-        // ========== CANNONBALLS ==========
-        const CANNONBALLS = {
-            small: { radius: 8, damage: 10, mass: 1, color: 0x333333, drag: 0.98, label: 'S' },
-            medium: { radius: 12, damage: 25, mass: 2, color: 0x222222, drag: 0.96, label: 'M' },
-            large: { radius: 18, damage: 50, mass: 4, color: 0x111111, drag: 0.94, label: 'L' }
+        // ========== FLAT DESIGN COLOR PALETTE ==========
+        const FLAT_COLORS = {
+            // Primary palette
+            primary: 0x4A6BFF,
+            primaryLight: 0x7A8BFF,
+            primaryDark: 0x2A4BCC,
+            
+            // Secondary palette
+            secondary: 0xFF6B6B,
+            secondaryLight: 0xFF8B8B,
+            secondaryDark: 0xCC4B4B,
+            
+            // Accent colors
+            accent: 0x4ECDC4,
+            accentLight: 0x7EDDD4,
+            accentDark: 0x2E9C94,
+            
+            // Neutrals
+            white: 0xFFFFFF,
+            offWhite: 0xF8F9FA,
+            lightGray: 0xE9ECEF,
+            gray: 0xA0A0A0,
+            darkGray: 0x6C757D,
+            darkerGray: 0x495057,
+            black: 0x212529,
+            
+            // Semantic colors
+            success: 0x28A745,
+            warning: 0xFFC107,
+            danger: 0xDC3545,
+            info: 0x17A2B8
         };
 
-        // ========== CASTLES ==========
+        // ========== CANNONBALLS (Flat Design) ==========
+        const CANNONBALLS = {
+            small: { radius: 8, damage: 10, mass: 1, color: FLAT_COLORS.darkGray, drag: 0.98, label: 'S' },
+            medium: { radius: 12, damage: 25, mass: 2, color: FLAT_COLORS.darkerGray, drag: 0.96, label: 'M' },
+            large: { radius: 18, damage: 50, mass: 4, color: FLAT_COLORS.black, drag: 0.94, label: 'L' }
+        };
+
+        // ========== CASTLES (Flat Design) ==========
         const CASTLES = [
             {
-                name: 'Neuschwanstein',
-                colors: { stone: 0xE8D5B7, roof: 0x8B4513, detail: 0x5D4037, window: 0x2E7D32 },
+                name: 'Modern Keep',
+                colors: {
+                    stone: FLAT_COLORS.offWhite,
+                    stoneShadow: FLAT_COLORS.lightGray,
+                    roof: FLAT_COLORS.primary,
+                    roofShadow: FLAT_COLORS.primaryDark,
+                    detail: FLAT_COLORS.accent,
+                    window: FLAT_COLORS.secondary
+                },
                 difficulty: 1.2,
                 draw: function(scene, x, y) {
                     const g = scene.add.graphics();
                     
-                    // Main tower
-                    g.fillStyle(this.colors.stone, 1);
-                    g.fillRect(x, y - 200, 80, 200);
-                    g.lineStyle(2, this.colors.detail);
-                    g.strokeRect(x, y - 200, 80, 200);
+                    // Main tower with subtle shadow
+                    g.fillStyle(this.colors.stoneShadow, 1);
+                    g.fillRoundedRect(x - 5, y - 200 + 5, 90, 200, 5);
                     
-                    // Conical roof
-                    g.fillStyle(this.colors.roof, 1);
+                    g.fillStyle(this.colors.stone, 1);
+                    g.fillRoundedRect(x, y - 200, 80, 200, 5);
+                    
+                    // Subtle highlight
+                    g.fillStyle(FLAT_COLORS.white, 0.3);
+                    g.beginPath();
+                    g.moveTo(x + 5, y - 200);
+                    g.lineTo(x + 80, y - 200);
+                    g.lineTo(x + 80, y - 180);
+                    g.lineTo(x + 5, y - 180);
+                    g.closePath();
+                    g.fillPath();
+                    
+                    // Conical roof with gradient effect
+                    g.fillStyle(this.colors.roofShadow, 1);
                     g.beginPath();
                     g.moveTo(x - 5, y - 200);
                     g.lineTo(x + 40, y - 260);
@@ -45,13 +108,42 @@
                     g.closePath();
                     g.fillPath();
                     
-                    // Side towers
-                    g.fillStyle(this.colors.stone, 1);
-                    g.fillRect(x - 80, y - 120, 60, 120);
-                    g.fillRect(x + 80, y - 120, 60, 120);
-                    
-                    // Pointed roofs
                     g.fillStyle(this.colors.roof, 1);
+                    g.beginPath();
+                    g.moveTo(x, y - 200);
+                    g.lineTo(x + 40, y - 255);
+                    g.lineTo(x + 80, y - 200);
+                    g.closePath();
+                    g.fillPath();
+                    
+                    // Side towers
+                    g.fillStyle(this.colors.stoneShadow, 1);
+                    g.fillRoundedRect(x - 85, y - 120 + 5, 65, 120, 3);
+                    g.fillRoundedRect(x + 85, y - 120 + 5, 65, 120, 3);
+                    
+                    g.fillStyle(this.colors.stone, 1);
+                    g.fillRoundedRect(x - 80, y - 120, 60, 120, 3);
+                    g.fillRoundedRect(x + 80, y - 120, 60, 120, 3);
+                    
+                    // Highlight on side towers
+                    g.fillStyle(FLAT_COLORS.white, 0.2);
+                    g.beginPath();
+                    g.moveTo(x - 75, y - 120);
+                    g.lineTo(x - 20, y - 120);
+                    g.lineTo(x - 20, y - 100);
+                    g.lineTo(x - 75, y - 100);
+                    g.closePath();
+                    g.fillPath();
+                    g.beginPath();
+                    g.moveTo(x + 85, y - 120);
+                    g.lineTo(x + 140, y - 120);
+                    g.lineTo(x + 140, y - 100);
+                    g.lineTo(x + 85, y - 100);
+                    g.closePath();
+                    g.fillPath();
+                    
+                    // Pointed roofs on side towers
+                    g.fillStyle(this.colors.roofShadow, 1);
                     g.beginPath();
                     g.moveTo(x - 80, y - 120);
                     g.lineTo(x - 50, y - 180);
@@ -65,36 +157,79 @@
                     g.closePath();
                     g.fillPath();
                     
-                    // Walls
-                    g.fillStyle(this.colors.stone, 1);
-                    g.fillRect(x - 60, y - 60, 200, 30);
+                    g.fillStyle(this.colors.roof, 1);
+                    g.beginPath();
+                    g.moveTo(x - 78, y - 118);
+                    g.lineTo(x - 50, y - 175);
+                    g.lineTo(x - 22, y - 118);
+                    g.closePath();
+                    g.fillPath();
+                    g.beginPath();
+                    g.moveTo(x + 82, y - 118);
+                    g.lineTo(x + 110, y - 175);
+                    g.lineTo(x + 138, y - 118);
+                    g.closePath();
+                    g.fillPath();
                     
-                    // Windows
+                    // Walls
+                    g.fillStyle(this.colors.stoneShadow, 1);
+                    g.fillRoundedRect(x - 65, y - 60 + 5, 210, 30, 2);
+                    g.fillStyle(this.colors.stone, 1);
+                    g.fillRoundedRect(x - 60, y - 60, 200, 30, 2);
+                    
+                    // Windows (modern flat design)
                     g.fillStyle(this.colors.window, 1);
                     for (let i = 0; i < 3; i++) {
-                        g.fillRect(x + 10 + i * 20, y - 180 + i * 30, 10, 15);
-                        g.fillRect(x + 40 + i * 20, y - 180 + i * 30, 10, 15);
+                        g.fillRoundedRect(x + 10 + i * 20, y - 180 + i * 30, 12, 18, 2);
+                        g.fillRoundedRect(x + 40 + i * 20, y - 180 + i * 30, 12, 18, 2);
                     }
+                    
+                    // Decorative elements
+                    g.fillStyle(this.colors.detail, 1);
+                    g.fillRoundedRect(x - 40, y - 40, 80, 5, 2);
+                    g.fillRoundedRect(x - 40, y - 20, 80, 5, 2);
                     
                     return g;
                 }
             },
             {
-                name: 'Schönbrunn',
-                colors: { stone: 0xF5E6D3, roof: 0x4E342E, detail: 0x3E2723, window: 0x1B5E20 },
+                name: 'Flat Fortress',
+                colors: {
+                    stone: FLAT_COLORS.offWhite,
+                    stoneShadow: FLAT_COLORS.lightGray,
+                    roof: FLAT_COLORS.secondary,
+                    roofShadow: FLAT_COLORS.secondaryDark,
+                    detail: FLAT_COLORS.accent,
+                    window: FLAT_COLORS.primary
+                },
                 difficulty: 1.0,
                 draw: function(scene, x, y) {
                     const g = scene.add.graphics();
                     
-                    // Main building (Baroque style)
+                    // Main building (Baroque style - flat design)
+                    g.fillStyle(this.colors.stoneShadow, 1);
+                    g.fillRoundedRect(x - 105, y - 100 + 5, 210, 100, 5);
+                    
                     g.fillStyle(this.colors.stone, 1);
-                    g.fillRect(x - 100, y - 100, 200, 100);
-                    g.lineStyle(2, this.colors.detail);
-                    g.strokeRect(x - 100, y - 100, 200, 100);
+                    g.fillRoundedRect(x - 100, y - 100, 200, 100, 5);
+                    
+                    // Highlight
+                    g.fillStyle(FLAT_COLORS.white, 0.3);
+                    g.beginPath();
+                    g.moveTo(x - 95, y - 100);
+                    g.lineTo(x + 100, y - 100);
+                    g.lineTo(x + 100, y - 80);
+                    g.lineTo(x - 95, y - 80);
+                    g.closePath();
+                    g.fillPath();
                     
                     // Mansard roof
+                    g.fillStyle(this.colors.roofShadow, 1);
+                    g.fillRoundedRect(x - 115, y - 100 + 5, 230, 25, 2);
+                    
                     g.fillStyle(this.colors.roof, 1);
-                    g.fillRect(x - 110, y - 100, 220, 20);
+                    g.fillRoundedRect(x - 110, y - 100, 220, 20, 2);
+                    
                     g.beginPath();
                     g.moveTo(x - 110, y - 100);
                     g.lineTo(x - 120, y - 120);
@@ -104,27 +239,37 @@
                     g.fillPath();
                     
                     // Side wings
+                    g.fillStyle(this.colors.stoneShadow, 1);
+                    g.fillRoundedRect(x - 185, y - 60 + 5, 85, 60, 3);
+                    g.fillRoundedRect(x + 105, y - 60 + 5, 85, 60, 3);
+                    
                     g.fillStyle(this.colors.stone, 1);
-                    g.fillRect(x - 180, y - 60, 80, 60);
-                    g.fillRect(x + 100, y - 60, 80, 60);
+                    g.fillRoundedRect(x - 180, y - 60, 80, 60, 3);
+                    g.fillRoundedRect(x + 100, y - 60, 80, 60, 3);
                     
                     // Decorative columns
                     g.fillStyle(this.colors.detail, 1);
                     for (let i = 0; i < 3; i++) {
-                        g.fillRect(x - 80 + i * 40, y - 100, 5, 30);
-                        g.fillRect(x - 85 + i * 40, y - 100, 15, 5);
+                        g.fillRoundedRect(x - 85 + i * 40, y - 100, 8, 25, 2);
+                        g.fillRoundedRect(x - 87 + i * 40, y - 100, 12, 5, 2);
                     }
                     
                     // Windows
                     g.fillStyle(this.colors.window, 1);
                     for (let i = 0; i < 5; i++) {
-                        g.fillRect(x - 90 + i * 40, y - 80, 12, 18);
-                        g.fillRect(x - 90 + i * 40, y - 40, 12, 18);
+                        g.fillRoundedRect(x - 90 + i * 40, y - 80, 14, 20, 2);
+                        g.fillRoundedRect(x - 90 + i * 40, y - 40, 14, 20, 2);
                     }
                     
-                    // Gardens (simplified)
-                    g.fillStyle(0x2E8B57, 0.4);
-                    g.fillRect(x - 150, y, 300, 40);
+                    // Gardens (simplified flat design)
+                    g.fillStyle(FLAT_COLORS.success, 0.3);
+                    g.fillRoundedRect(x - 150, y, 300, 30, 0);
+                    
+                    // Garden texture lines
+                    g.fillStyle(FLAT_COLORS.success, 0.5);
+                    for (let i = 0; i < 15; i++) {
+                        g.fillRoundedRect(x - 150 + i * 20, y + 5, 10, 2, 1);
+                    }
                     
                     return g;
                 }
@@ -133,13 +278,13 @@
 
         // ========== MINI-GAMES ==========
         const MINI_GAMES = [
-            { id: 'trivia', name: 'Castle Trivia', icon: '📚' },
-            { id: 'reflex', name: 'Quick Reflex', icon: '🎯' }
+            { id: 'trivia', name: 'Castle Trivia', icon: '\ud83d\udcda' },
+            { id: 'reflex', name: 'Quick Reflex', icon: '\ud83c\udfaf' }
         ];
 
         const TRIVIA = [
-            { q: "Which castle inspired Disney's Sleeping Beauty?", a: ["Neuschwanstein","Edinburgh","Himeji","Windsor"], correct: 0 },
-            { q: "Where is Schönbrunn Palace?", a: ["Germany","Austria","France","Italy"], correct: 1 },
+            { q: "Which castle inspired Disney\'s Sleeping Beauty?", a: ["Neuschwanstein","Edinburgh","Himeji","Windsor"], correct: 0 },
+            { q: "Where is Schonbrunn Palace?", a: ["Germany","Austria","France","Italy"], correct: 1 },
             { q: "What style is Neuschwanstein?", a: ["Baroque","Romanesque","Gothic Revival","Renaissance"], correct: 2 }
         ];
 
@@ -170,10 +315,20 @@
 
             createBG() {
                 const g = this.add.graphics();
-                g.fillGradientStyle(0x87CEEB, 0x87CEEB, 0xE0F7FF, 0xE0F7FF);
+                
+                // Gradient background
+                g.fillGradientStyle(0x667eea, 0x667eea, 0x764ba2, 0x764ba2, 0);
                 g.fillRect(0, 0, 800, 600);
-                g.fillStyle(0x228B22);
-                g.fillRect(0, 500, 800, 100);
+                
+                // Ground
+                g.fillStyle(FLAT_COLORS.darkGray, 1);
+                g.fillRoundedRect(0, 500, 800, 100, 0, 0, 20, 20);
+                
+                // Subtle ground texture
+                g.fillStyle(FLAT_COLORS.gray, 0.3);
+                for (let i = 0; i < 80; i++) {
+                    g.fillRoundedRect(i * 10, 500, 10, 2, 0, 0, 5, 5);
+                }
             }
 
             createCastle() {
@@ -182,46 +337,111 @@
             }
 
             createCannon() {
+                // Base with shadow
+                const baseShadow = this.add.graphics();
+                baseShadow.fillStyle(FLAT_COLORS.darkGray, 0.3);
+                baseShadow.fillRoundedRect(60, 495, 80, 35, 5);
+                
                 // Base
                 const base = this.add.graphics();
-                base.fillStyle(0x5C4033);
-                base.fillRect(60, 490, 80, 30);
+                base.fillStyle(FLAT_COLORS.darkerGray, 1);
+                base.fillRoundedRect(60, 490, 80, 30, 5);
+                
+                // Base highlight
+                base.fillStyle(FLAT_COLORS.gray, 0.5);
+                base.fillRoundedRect(62, 492, 76, 5, 2, 2, 0, 0);
+                
+                // Wheels
+                base.fillStyle(FLAT_COLORS.darkGray, 1);
                 base.fillCircle(75, 520, 15);
                 base.fillCircle(125, 520, 15);
+                
+                // Wheel highlights
+                base.fillStyle(FLAT_COLORS.gray, 0.7);
+                base.fillCircle(75, 515, 8);
+                base.fillCircle(125, 515, 8);
 
                 // Barrel
                 this.barrel = this.add.graphics();
                 this.barrel.setPosition(140, 500);
-                this.barrel.fillStyle(0x2F4F4F);
-                this.barrel.fillRect(0, -10, 80, 20);
+                this.barrel.fillStyle(FLAT_COLORS.darkGray, 1);
+                this.barrel.fillRoundedRect(0, -10, 80, 20, 10);
+                
+                // Barrel highlight
+                this.barrel.fillStyle(FLAT_COLORS.gray, 0.5);
+                this.barrel.fillRoundedRect(2, -8, 76, 4, 8, 8, 0, 0);
+                
+                // Barrel end
+                this.barrel.fillStyle(FLAT_COLORS.black, 1);
+                this.barrel.fillRoundedRect(76, -10, 4, 20, 2);
+                
                 this.angle = -0.3;
                 this.updateBarrel();
 
+                // Powder bag with shadow
+                const powderShadow = this.add.graphics();
+                powderShadow.fillStyle(FLAT_COLORS.darkGray, 0.3);
+                powderShadow.fillRoundedRect(20, 455, 40, 55, 5);
+                
                 // Powder bag
                 this.powderBtn = this.add.graphics();
-                this.powderBtn.fillStyle(0x8B4513);
-                this.powderBtn.fillRect(20, 450, 40, 50);
+                this.powderBtn.fillStyle(FLAT_COLORS.roofBrown || FLAT_COLORS.secondaryDark, 1);
+                this.powderBtn.fillRoundedRect(20, 450, 40, 50, 5);
+                
+                // Powder bag highlight
+                this.powderBtn.fillStyle(FLAT_COLORS.secondary, 0.5);
+                this.powderBtn.fillRoundedRect(22, 452, 36, 8, 2, 2, 0, 0);
+                
+                // Powder bag strap
+                this.powderBtn.fillStyle(FLAT_COLORS.accent, 1);
+                this.powderBtn.fillRoundedRect(30, 475, 20, 8, 2);
+                
                 this.powderBtn.setInteractive();
                 this.powderBtn.on('pointerdown', () => this.addPowder(10));
-                this.add.text(40, 475, '💣');
+                
+                // Powder icon
+                this.add.text(40, 475, '\ud83d\udca3', {font:'24px Arial',fill:'#FFFFFF'}).setOrigin(0.5);
 
                 // Ball size buttons
                 this.ballBtns = {};
                 ['small','medium','large'].forEach((s,i) => {
                     const x = 150 + i * 60;
+                    
+                    // Button shadow
+                    const btnShadow = this.add.graphics();
+                    btnShadow.fillStyle(FLAT_COLORS.darkGray, 0.3);
+                    btnShadow.fillCircle(x, 555, 27);
+                    
                     const btn = this.add.graphics();
-                    btn.fillStyle(this.state.ballSize === s ? 0xFFD700 : 0xC0C0C0);
+                    btn.fillStyle(this.state.ballSize === s ? FLAT_COLORS.gold : FLAT_COLORS.lightGray, 1);
                     btn.fillCircle(x, 550, 25);
+                    
+                    // Button highlight
+                    btn.fillStyle(FLAT_COLORS.white, 0.3);
+                    btn.fillCircle(x - 5, 545, 8);
+                    
                     btn.setInteractive();
                     btn.on('pointerdown', () => this.setBall(s));
-                    this.add.text(x, 550, CANNONBALLS[s].label, {font:'20px Arial',fill:'#000'}).setOrigin(0.5);
+                    this.add.text(x, 550, CANNONBALLS[s].label, {font:'20px Roboto',fill:'#000', fontWeight:'bold'}).setOrigin(0.5);
                     this.ballBtns[s] = btn;
                 });
 
-                // Fire button
+                // Fire button with shadow
+                const fireShadow = this.add.graphics();
+                fireShadow.fillStyle(FLAT_COLORS.darkGray, 0.3);
+                fireShadow.fillCircle(0, 5, 27);
+                
                 this.fireBtn = this.add.graphics();
-                this.fireBtn.fillStyle(0xFF4500);
+                this.fireBtn.fillStyle(FLAT_COLORS.secondary, 1);
                 this.fireBtn.fillCircle(0, 0, 25);
+                
+                // Fire button highlight
+                this.fireBtn.fillStyle(FLAT_COLORS.white, 0.4);
+                this.fireBtn.fillCircle(-5, -5, 8);
+                
+                // Fire icon
+                this.add.text(0, 0, '\ud83d\udd25', {font:'16px Arial',fill:'#FFFFFF'}).setOrigin(0.5);
+                
                 this.fireBtn.setInteractive();
                 this.fireBtn.on('pointerdown', () => this.fire());
                 this.fireBtn.setVisible(false);
@@ -241,21 +461,91 @@
             }
 
             createUI() {
-                this.scoreTxt = this.add.text(20, 20, `Score: ${this.state.score}`, {font:'20px Arial',fill:'#000'});
-                this.castleTxt = this.add.text(20, 50, `Castles: ${this.state.castles}`, {font:'20px Arial',fill:'#000'});
-                this.powderTxt = this.add.text(150, 430, `Powder: ${this.state.powder}%`, {font:'16px Arial',fill:'#000'}).setOrigin(0.5);
-                this.ballTxt = this.add.text(150, 460, `Ball: ${this.state.ballSize.toUpperCase()}`, {font:'16px Arial',fill:'#000'}).setOrigin(0.5);
+                // Score panel
+                const scorePanel = this.add.graphics();
+                scorePanel.fillStyle(FLAT_COLORS.white, 0.9);
+                scorePanel.fillRoundedRect(10, 10, 200, 80, 5);
+                
+                // Score panel shadow
+                const scoreShadow = this.add.graphics();
+                scoreShadow.fillStyle(FLAT_COLORS.darkGray, 0.2);
+                scoreShadow.fillRoundedRect(12, 12, 200, 80, 5);
+                
+                this.scoreTxt = this.add.text(20, 20, `Score: ${this.state.score}`, {
+                    font:'20px Roboto',
+                    fill:'#' + FLAT_COLORS.darkGray.toString(16).padStart(6, '0'),
+                    fontWeight:'500'
+                });
+                
+                this.castleTxt = this.add.text(20, 50, `Castles: ${this.state.castles}`, {
+                    font:'20px Roboto',
+                    fill:'#' + FLAT_COLORS.darkGray.toString(16).padStart(6, '0'),
+                    fontWeight:'500'
+                });
+                
+                // Powder panel
+                const powderPanel = this.add.graphics();
+                powderPanel.fillStyle(FLAT_COLORS.white, 0.9);
+                powderPanel.fillRoundedRect(130, 420, 140, 80, 5);
+                
+                const powderShadow = this.add.graphics();
+                powderShadow.fillStyle(FLAT_COLORS.darkGray, 0.2);
+                powderShadow.fillRoundedRect(132, 422, 140, 80, 5);
+                
+                this.powderTxt = this.add.text(150, 430, `Powder: ${this.state.powder}%`, {
+                    font:'16px Roboto',
+                    fill:'#' + FLAT_COLORS.darkGray.toString(16).padStart(6, '0'),
+                    fontWeight:'400'
+                }).setOrigin(0.5);
+                
+                this.ballTxt = this.add.text(150, 460, `Ball: ${this.state.ballSize.toUpperCase()}`, {
+                    font:'16px Roboto',
+                    fill:'#' + FLAT_COLORS.darkGray.toString(16).padStart(6, '0'),
+                    fontWeight:'400'
+                }).setOrigin(0.5);
             }
 
             createTimer() {
-                this.timerTxt = this.add.text(700, 20, this.formatTime(this.state.time), {font:'24px Arial',fill:'#000'});
+                // Timer panel
+                const timerPanel = this.add.graphics();
+                timerPanel.fillStyle(FLAT_COLORS.white, 0.9);
+                timerPanel.fillRoundedRect(690, 10, 100, 50, 5);
+                
+                const timerShadow = this.add.graphics();
+                timerShadow.fillStyle(FLAT_COLORS.darkGray, 0.2);
+                timerShadow.fillRoundedRect(692, 12, 100, 50, 5);
+                
+                this.timerTxt = this.add.text(700, 20, this.formatTime(this.state.time), {
+                    font:'24px Roboto',
+                    fill:'#' + FLAT_COLORS.darkGray.toString(16).padStart(6, '0'),
+                    fontWeight:'700'
+                });
+                
+                // Fire stick panel
+                const firePanel = this.add.graphics();
+                firePanel.fillStyle(FLAT_COLORS.white, 0.9);
+                firePanel.fillRoundedRect(690, 50, 100, 140, 5);
+                
+                const fireShadow = this.add.graphics();
+                fireShadow.fillStyle(FLAT_COLORS.darkGray, 0.2);
+                fireShadow.fillRoundedRect(692, 52, 100, 140, 5);
+                
+                // Fire stick
                 this.fireStick = this.add.graphics();
-                this.fireStick.fillStyle(0xFF4500);
-                this.fireStick.fillRect(700, 50, 20, 120);
+                this.fireStick.fillStyle(FLAT_COLORS.darkerGray, 1);
+                this.fireStick.fillRoundedRect(700, 70, 20, 120, 2);
+                
+                // Fire stick highlight
+                this.fireStick.fillStyle(FLAT_COLORS.gray, 0.5);
+                this.fireStick.fillRoundedRect(702, 72, 16, 4, 8, 8, 0, 0);
+                
+                // Fire burn indicator
                 this.fireBurn = this.add.graphics();
-                this.fireBurn.fillStyle(0xFF8C00);
-                this.fireBurn.fillRect(700, 50, 20, 0);
-                this.add.text(700, 80, '🔥');
+                this.fireBurn.fillStyle(FLAT_COLORS.secondary, 1);
+                this.fireBurn.fillRoundedRect(700, 70, 20, 0, 2);
+                
+                // Fire icon
+                this.add.text(700, 40, '\ud83d\udd25', {font:'20px Arial',fill:'#' + FLAT_COLORS.secondary.toString(16).padStart(6, '0')}).setOrigin(0.5);
 
                 this.time.addEvent({delay:1000,callback:()=>{
                     if (!this.state.active) return;
@@ -268,8 +558,8 @@
                     this.timerTxt.setText(this.formatTime(this.state.time));
                     const p = (this.state.maxTime - this.state.time) / this.state.maxTime;
                     this.fireBurn.clear();
-                    this.fireBurn.fillStyle(this.state.time <= 10 ? 0xFF0000 : 0xFF8C00);
-                    this.fireBurn.fillRect(700, 50, 20, 120 * p);
+                    this.fireBurn.fillStyle(this.state.time <= 10 ? FLAT_COLORS.danger : FLAT_COLORS.secondary, 1);
+                    this.fireBurn.fillRoundedRect(700, 70 + (120 * (1 - p)), 20, 120 * p, 2);
                 },loop:true});
             }
 
@@ -280,12 +570,42 @@
             }
 
             createMiniGameBtn() {
+                // Button shadow
+                const btnShadow = this.add.graphics();
+                btnShadow.fillStyle(FLAT_COLORS.darkGray, 0.3);
+                btnShadow.fillRoundedRect(750, 555, 120, 45, 5);
+                
                 const btn = this.add.graphics();
-                btn.fillStyle(0x4CAF50);
+                btn.fillStyle(FLAT_COLORS.primary, 1);
                 btn.fillRoundedRect(750, 550, 120, 40, 5);
+                
+                // Button highlight
+                btn.fillStyle(FLAT_COLORS.white, 0.3);
+                btn.fillRoundedRect(752, 552, 116, 8, 2, 2, 0, 0);
+                
                 btn.setInteractive();
-                btn.on('pointerdown', () => this.startMiniGame());
-                this.add.text(750, 550, 'Mini-Game', {font:'16px Arial',fill:'#fff'}).setOrigin(0.5);
+                btn.on('pointerdown', () => {
+                    btn.clear();
+                    btn.fillStyle(FLAT_COLORS.primaryDark, 1);
+                    btn.fillRoundedRect(750, 550, 120, 40, 5);
+                    btn.fillStyle(FLAT_COLORS.white, 0.3);
+                    btn.fillRoundedRect(752, 552, 116, 8, 2, 2, 0, 0);
+                    this.startMiniGame();
+                });
+                
+                btn.on('pointerup', () => {
+                    btn.clear();
+                    btn.fillStyle(FLAT_COLORS.primary, 1);
+                    btn.fillRoundedRect(750, 550, 120, 40, 5);
+                    btn.fillStyle(FLAT_COLORS.white, 0.3);
+                    btn.fillRoundedRect(752, 552, 116, 8, 2, 2, 0, 0);
+                });
+                
+                this.add.text(750, 550, 'Mini-Game', {
+                    font:'16px Roboto',
+                    fill:'#FFFFFF',
+                    fontWeight:'500'
+                }).setOrigin(0.5);
             }
 
             startMiniGame() {
@@ -297,41 +617,129 @@
             showTrivia(game) {
                 // Overlay
                 this.overlay = this.add.graphics();
-                this.overlay.fillStyle(0x000000, 0.8);
+                this.overlay.fillStyle(FLAT_COLORS.black, 0.7);
                 this.overlay.fillRect(0, 0, 800, 600);
 
-                this.add.text(400, 100, game.name, {font:'32px Arial',fill:'#FFD700'}).setOrigin(0.5);
+                // Modal panel
+                const modal = this.add.graphics();
+                modal.fillStyle(FLAT_COLORS.white, 1);
+                modal.fillRoundedRect(100, 100, 600, 400, 10);
+                
+                // Modal shadow
+                const modalShadow = this.add.graphics();
+                modalShadow.fillStyle(FLAT_COLORS.darkGray, 0.3);
+                modalShadow.fillRoundedRect(105, 105, 600, 400, 10);
+
+                this.add.text(400, 150, game.name, {
+                    font:'32px Roboto',
+                    fill:'#' + FLAT_COLORS.primary.toString(16).padStart(6, '0'),
+                    fontWeight:'700'
+                }).setOrigin(0.5);
                 
                 const q = TRIVIA[Math.floor(Math.random()*TRIVIA.length)];
-                this.add.text(400, 200, q.q, {font:'20px Arial',fill:'#fff',wordWrap:{width:600}}).setOrigin(0.5);
+                this.add.text(400, 220, q.q, {
+                    font:'20px Roboto',
+                    fill:'#' + FLAT_COLORS.darkGray.toString(16).padStart(6, '0'),
+                    wordWrap:{width:560},
+                    fontWeight:'400'
+                }).setOrigin(0.5);
 
                 q.a.forEach((a,i) => {
+                    // Button shadow
+                    const btnShadow = this.add.graphics();
+                    btnShadow.fillStyle(FLAT_COLORS.darkGray, 0.3);
+                    btnShadow.fillRoundedRect(400, 285+i*60, 500, 45, 5);
+                    
                     const btn = this.add.graphics();
-                    btn.fillStyle(0x3498DB);
+                    btn.fillStyle(FLAT_COLORS.primary, 1);
                     btn.fillRoundedRect(400, 280+i*60, 500, 40, 5);
+                    
+                    // Button highlight
+                    btn.fillStyle(FLAT_COLORS.white, 0.3);
+                    btn.fillRoundedRect(402, 282+i*60, 496, 8, 2, 2, 0, 0);
+                    
                     btn.setInteractive();
-                    btn.on('pointerdown', () => this.checkAnswer(i, q.correct, btn));
-                    this.add.text(400, 280+i*60, a, {font:'18px Arial',fill:'#fff',wordWrap:{width:480}}).setOrigin(0.5);
+                    btn.on('pointerdown', () => {
+                        btn.clear();
+                        btn.fillStyle(FLAT_COLORS.primaryDark, 1);
+                        btn.fillRoundedRect(400, 280+i*60, 500, 40, 5);
+                        this.checkAnswer(i, q.correct, btn);
+                    });
+                    
+                    btn.on('pointerover', () => {
+                        btn.clear();
+                        btn.fillStyle(FLAT_COLORS.primaryLight, 1);
+                        btn.fillRoundedRect(400, 280+i*60, 500, 40, 5);
+                        btn.fillStyle(FLAT_COLORS.white, 0.4);
+                        btn.fillRoundedRect(402, 282+i*60, 496, 8, 2, 2, 0, 0);
+                    });
+                    
+                    btn.on('pointerout', () => {
+                        btn.clear();
+                        btn.fillStyle(FLAT_COLORS.primary, 1);
+                        btn.fillRoundedRect(400, 280+i*60, 500, 40, 5);
+                        btn.fillStyle(FLAT_COLORS.white, 0.3);
+                        btn.fillRoundedRect(402, 282+i*60, 496, 8, 2, 2, 0, 0);
+                    });
+                    
+                    this.add.text(400, 280+i*60, a, {
+                        font:'18px Roboto',
+                        fill:'#FFFFFF',
+                        wordWrap:{width:480},
+                        fontWeight:'400'
+                    }).setOrigin(0.5);
                 });
 
+                // Back button
+                const backShadow = this.add.graphics();
+                backShadow.fillStyle(FLAT_COLORS.darkGray, 0.3);
+                backShadow.fillRoundedRect(750, 555, 120, 45, 5);
+                
                 const back = this.add.graphics();
-                back.fillStyle(0xF44336);
+                back.fillStyle(FLAT_COLORS.danger, 1);
                 back.fillRoundedRect(750, 550, 120, 40, 5);
+                
+                back.fillStyle(FLAT_COLORS.white, 0.3);
+                back.fillRoundedRect(752, 552, 116, 8, 2, 2, 0, 0);
+                
                 back.setInteractive();
                 back.on('pointerdown', () => this.closeMiniGame());
-                this.add.text(750, 550, 'Back', {font:'16px Arial',fill:'#fff'}).setOrigin(0.5);
+                back.on('pointerover', () => {
+                    back.clear();
+                    back.fillStyle(FLAT_COLORS.danger, 0.8);
+                    back.fillRoundedRect(750, 550, 120, 40, 5);
+                    back.fillStyle(FLAT_COLORS.white, 0.4);
+                    back.fillRoundedRect(752, 552, 116, 8, 2, 2, 0, 0);
+                });
+                back.on('pointerout', () => {
+                    back.clear();
+                    back.fillStyle(FLAT_COLORS.danger, 1);
+                    back.fillRoundedRect(750, 550, 120, 40, 5);
+                    back.fillStyle(FLAT_COLORS.white, 0.3);
+                    back.fillRoundedRect(752, 552, 116, 8, 2, 2, 0, 0);
+                });
+                
+                this.add.text(750, 550, 'Back', {
+                    font:'16px Roboto',
+                    fill:'#FFFFFF',
+                    fontWeight:'500'
+                }).setOrigin(0.5);
             }
 
             checkAnswer(selected, correct, btn) {
                 if (selected === correct) {
-                    btn.fillStyle(0x2ECC71);
+                    btn.clear();
+                    btn.fillStyle(FLAT_COLORS.success, 1);
+                    btn.fillRoundedRect(400, btn.y, 500, 40, 5);
                     this.time.delayedCall(1000, () => {
                         this.closeMiniGame();
                         this.state.time += 15; // Add 15 seconds
                         this.state.active = true;
                     });
                 } else {
-                    btn.fillStyle(0xE74C3C);
+                    btn.clear();
+                    btn.fillStyle(FLAT_COLORS.danger, 1);
+                    btn.fillRoundedRect(400, btn.y, 500, 40, 5);
                     this.time.delayedCall(1000, () => this.closeMiniGame());
                 }
             }
@@ -346,15 +754,13 @@
             }
 
             onPointerDown(pointer) {
-                // Check if pointer is near the barrel (left end at 140,500, length 80, height 20)
+                // Check if pointer is near the barrel
                 const barrelX = 140;
                 const barrelY = 500;
                 const barrelLength = 80;
                 const barrelHeight = 20;
-                // Calculate rotated position of barrel end
                 const endX = barrelX + Math.cos(this.angle) * barrelLength;
                 const endY = barrelY + Math.sin(this.angle) * barrelLength;
-                // Create a rectangle from (140,490) to (endX, endY+20) - barrel bounds
                 const minX = Math.min(barrelX, endX);
                 const maxX = Math.max(barrelX, endX);
                 const minY = Math.min(barrelY - 10, endY - 10);
@@ -390,8 +796,10 @@
                 this.state.ballSize = size;
                 Object.keys(this.ballBtns).forEach(s => {
                     this.ballBtns[s].clear();
-                    this.ballBtns[s].fillStyle(this.state.ballSize === s ? 0xFFD700 : 0xC0C0C0);
-                    this.ballBtns[s].fillCircle(this.ballBtns[s].x, this.ballBtns[s].y, 25);
+                    this.ballBtns[s].fillStyle(this.state.ballSize === s ? FLAT_COLORS.gold : FLAT_COLORS.lightGray, 1);
+                    this.ballBtns[s].fillCircle(this.ballBtns[s].x, 550, 25);
+                    this.ballBtns[s].fillStyle(FLAT_COLORS.white, 0.3);
+                    this.ballBtns[s].fillCircle(this.ballBtns[s].x - 5, 545, 8);
                 });
                 this.ballTxt.setText(`Ball: ${this.state.ballSize.toUpperCase()}`);
             }
@@ -407,8 +815,13 @@
                 const velocity = power * 600;
 
                 const ball = this.add.graphics();
-                ball.fillStyle(cfg.color);
+                ball.fillStyle(cfg.color, 1);
                 ball.fillCircle(0, 0, cfg.radius);
+                
+                // Add subtle highlight
+                ball.fillStyle(FLAT_COLORS.white, 0.2);
+                ball.fillCircle(-cfg.radius * 0.3, -cfg.radius * 0.3, cfg.radius * 0.4);
+                
                 ball.setPosition(sx, sy);
 
                 this.physics.add.existing(ball);
@@ -428,7 +841,7 @@
 
                 // Muzzle flash
                 const flash = this.add.graphics();
-                flash.fillStyle(0xFFFF00, 0.8);
+                flash.fillStyle(FLAT_COLORS.gold, 0.8);
                 flash.fillCircle(sx, sy, 15);
                 this.tweens.add({targets:flash, radius:0, alpha:0, duration:200, onComplete:()=>flash.destroy()});
 
@@ -436,7 +849,7 @@
                 this.physics.add.collider(ball, this.castle.parts, (b,p) => this.hitCastle(b));
                 this.physics.add.collider(ball, this.physics.world.bounds, () => {
                     const dust = this.add.graphics();
-                    dust.fillStyle(0x8B4513, 0.7);
+                    dust.fillStyle(FLAT_COLORS.darkerGray, 0.7);
                     dust.fillEllipse(b.x, b.y, 25, 15);
                     this.tweens.add({targets:dust, alpha:0, scale:1.5, duration:300, onComplete:()=>dust.destroy()});
                     b.destroy();
@@ -448,7 +861,7 @@
             hitCastle(ball) {
                 this.castle.takeDamage(ball.damage);
                 const hit = this.add.graphics();
-                hit.fillStyle(0xFF4500, 0.8);
+                hit.fillStyle(FLAT_COLORS.secondary, 0.8);
                 hit.fillCircle(ball.x, ball.y, 10);
                 this.tweens.add({targets:hit, radius:25, alpha:0, duration:200, onComplete:()=>hit.destroy()});
                 ball.destroy();
@@ -474,21 +887,30 @@
                 const castle = this.type.draw(this.scene, this.x, this.y);
                 this.parts.push(castle);
 
-                // Health bar
+                // Health bar background
                 this.hpBg = this.scene.add.graphics();
-                this.hpBg.fillStyle(0x000000, 0.5);
-                this.hpBg.fillRoundedRect(this.x - 50, this.y - 150, 100, 10, 5);
+                this.hpBg.fillStyle(FLAT_COLORS.darkGray, 0.2);
+                this.hpBg.fillRoundedRect(this.x - 60, this.y - 150, 120, 15, 7);
+                
+                // Health bar
                 this.hpBar = this.scene.add.graphics();
-                this.hpBar.fillStyle(0x00FF00);
-                this.hpBar.fillRoundedRect(this.x - 50, this.y - 150, 100, 10, 5);
+                this.hpBar.fillStyle(FLAT_COLORS.success, 1);
+                this.hpBar.fillRoundedRect(this.x - 50, this.y - 147, 100, 8, 5);
+                
+                // Health bar border
+                this.hpBorder = this.scene.add.graphics();
+                this.hpBorder.fillStyle(FLAT_COLORS.white, 0.8);
+                this.hpBorder.fillRoundedRect(this.x - 60, this.y - 150, 120, 15, 7);
+                this.hpBorder.fillStyle(FLAT_COLORS.white, 0.3);
+                this.hpBorder.fillRoundedRect(this.x - 58, this.y - 148, 116, 11, 5);
             }
 
             takeDamage(dmg) {
                 this.health -= dmg;
                 const p = (this.health / this.maxHealth) * 100;
                 this.hpBar.clear();
-                this.hpBar.fillStyle(p < 30 ? 0xFF0000 : p < 60 ? 0xFFA500 : 0x00FF00);
-                this.hpBar.fillRoundedRect(this.x - 50, this.y - 150, p, 10, 5);
+                this.hpBar.fillStyle(p < 30 ? FLAT_COLORS.danger : p < 60 ? FLAT_COLORS.warning : FLAT_COLORS.success, 1);
+                this.hpBar.fillRoundedRect(this.x - 50, this.y - 147, p, 8, 5);
 
                 this.parts.forEach(p => {
                     this.scene.tweens.add({targets:p, x:p.x+Phaser.Math.Between(-3,3), y:p.y+Phaser.Math.Between(-3,3), duration:50, yoyo:true});
@@ -513,6 +935,7 @@
                 this.parts.forEach(p => p.destroy());
                 this.hpBar.destroy();
                 this.hpBg.destroy();
+                this.hpBorder.destroy();
             }
         }
 
@@ -522,7 +945,7 @@
             width: 800,
             height: 600,
             parent: 'game',
-            backgroundColor: '#87CEEB',
+            backgroundColor: '#667eea',
             physics: { default: 'arcade', arcade: { gravity: { y: 400 }, debug: false } },
             scene: [MainScene]
         };
