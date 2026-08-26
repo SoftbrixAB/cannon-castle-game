@@ -7,8 +7,21 @@
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.80.1/dist/phaser.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: #87CEEB; overflow: hidden; touch-action: none; user-select: none; }
-        #game { width: 100vw; height: 100vh; display: block; }
+        body { 
+            background: #87CEEB; 
+            overflow: hidden; 
+            touch-action: none; 
+            user-select: none;
+            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+        }
+        #game { 
+            width: 100vw; 
+            height: 100vh; 
+            display: block;
+            /* Prevent overscroll bounce on iOS */
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior: none;
+        }
     </style>
 </head>
 <body>
@@ -521,7 +534,13 @@
             parent: 'game',
             backgroundColor: '#87CEEB',
             physics: { default: 'arcade', arcade: { gravity: { y: 400 }, debug: false } },
-            scene: [MainScene]
+            scene: [MainScene],
+            scale: {
+                mode: Phaser.Scale.FIT,
+                autoCenter: Phaser.Scale.CENTER_BOTH,
+                width: 800,
+                height: 600
+            }
         };
 
         // ========== INIT ==========
