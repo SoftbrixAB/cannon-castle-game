@@ -670,15 +670,17 @@
         // Test 12: Ball size selection works correctly
         tests.addTest('Ball size selection works correctly', () => {
             const mockScene = {
-                state: { ballSize: 'medium' },
+                state: { ballSize: 'medium', active: true },
                 ballTxt: { setText: (text) => { mockScene.lastText = text; } },
                 ballBtns: {
                     small: { clear: () => {}, fillStyle: () => {}, fillCircle: () => {}, x: 150, y: 550 },
                     medium: { clear: () => {}, fillStyle: () => {}, fillCircle: () => {}, x: 210, y: 550 },
                     large: { clear: () => {}, fillStyle: () => {}, fillCircle: () => {}, x: 270, y: 550 }
-                },
-                setBall: MainScene.prototype.setBall
+                }
             };
+            
+            // Bind setBall to mockScene so 'this' refers to mockScene
+            mockScene.setBall = MainScene.prototype.setBall.bind(mockScene);
             
             mockScene.setBall('large');
             if (mockScene.state.ballSize !== 'large') throw new Error('Ball size should be large');
