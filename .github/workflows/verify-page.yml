@@ -1,0 +1,84 @@
+name: Verify Page Loads
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  verify-page:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - name: Install Puppeteer
+      run: npm install puppeteer
+
+    - name: Verify page loads without errors
+      run: |
+        node -e "
+        const puppeteer = require('puppeteer');
+        
+        (async () => {
+          const browser = await puppeteer.launch({
+            headless: true,
+            args: ['--no-sandbox', '--disable-setuid-sandbox']
+          });
+          
+          const page = await browser.newPage();
+          
+          const consoleMessages = [];
+          page.on('console', msg => {
+            consoleMessages.push(msg.text());
+          });
+          
+          const errors = [];
+          page.on('pageerror', error => {
+            errors.push(error.toString());
+          });
+          
+          page.on('error', error => {
+            errors.push(error.toString());
+          });
+          
+          await page.goto('file://' + process.cwd() + '/index.html', {
+            waitUntil: 'networkidle0',
+            timeout: 10000
+          });
+          
+          await page.waitForTimeout(3000);
+          
+          if (errors.length > 0) {
+            console.error('ERRORS FOUND:');
+            errors.forEach(e => console.error('  -', e));
+            process.exit(1);
+          }
+          
+          const errorMsgs = consoleMessages.filter(m => 
+            m.includes('Error') || m.includes('error') || m.includes('Uncaught')
+          );
+          
+          if (errorMsgs.length > 0) {
+            console.error('CONSOLE ERRORS:');
+            errorMsgs.forEach(e => console.error('  -', e));
+            process.exit(1);
+          }
+          
+          console.log('=== Console Messages ===');
+          consoleMessages.forEach(m => console.log('  ', m));
+          
+          console.log('\n=== Verification Complete ===');
+          console.log('Page loaded successfully with no errors!');
+          
+          await browser.close();
+        })();
+        "
+      shell: bash
