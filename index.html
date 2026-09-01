@@ -227,9 +227,17 @@
                     btn.setPosition(150 + i * 60, 550);
                     btn.fillStyle(this.state.ballSize === s ? 0xFFD700 : 0xC0C0C0);
                     btn.fillCircle(0, 0, 25);
-                    btn.setInteractive();
+                    // Make click area larger with hitArea
+                    btn.setInteractive({ useHandCursor: true });
+                    btn.setSize(60, 60);
                     btn.on('pointerdown', () => this.setBall(s));
                     this.add.text(x, 550, CANNONBALLS[s].label, {font:'20px Arial',fill:'#000'}).setOrigin(0.5);
+                    // Debug: render pink clickable area
+                    const debugArea = this.add.graphics();
+                    debugArea.setPosition(150 + i * 60, 550);
+                    debugArea.fillStyle(0xFF00FF, 0.2);
+                    debugArea.fillRect(-30, -30, 60, 60);
+                    debugArea.setDepth(-1);
                     this.ballBtns[s] = btn;
                 });
 
