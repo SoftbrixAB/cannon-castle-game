@@ -1,0 +1,17 @@
+{
+  "name": "cannon-castle-game-tests",
+  "version": "1.0.0",
+  "description": "Node.js tests for Cannon Castle Game",
+  "main": "game.test.js",
+  "scripts": {
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
+  },
+  "keywords": ["game", "test", "phaser"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "jest": "^29.7.0"
+  }
+}
