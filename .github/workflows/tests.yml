@@ -24,7 +24,11 @@ jobs:
         cd test
         npm ci
 
-    - name: Run tests
+    - name: Run unit tests
       run: |
         cd test
         npm test
+    - name: Run page load tests
+      run: |
+        cd test
+        npx jest page-load.test.js
