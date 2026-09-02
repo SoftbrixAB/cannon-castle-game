@@ -54,7 +54,7 @@ jobs:
             timeout: 10000
           });
           
-          await page.waitForTimeout(3000);
+          await new Promise(resolve => setTimeout(resolve, 3000));
           
           if (errors.length > 0) {
             console.error('ERRORS FOUND:');
