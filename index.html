@@ -228,8 +228,7 @@
                     btn.fillStyle(this.state.ballSize === s ? 0xFFD700 : 0xC0C0C0);
                     btn.fillCircle(0, 0, 25);
                     // Make click area larger with custom hitArea
-                    btn.setInteractive();
-                    btn.input.hitArea = new Phaser.Geom.Circle(0, 0, 30);
+                    btn.setInteractive(new Phaser.Geom.Circle(0, 0, 30), Phaser.Geom.Circle.Contains);
                     btn.input.cursor = 'pointer';
                     btn.on('pointerdown', () => this.setBall(s));
                     this.add.text(x, 550, CANNONBALLS[s].label, {font:'20px Arial',fill:'#000'}).setOrigin(0.5);
