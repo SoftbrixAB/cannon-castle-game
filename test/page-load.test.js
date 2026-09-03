@@ -72,19 +72,19 @@ describe('Page Load Verification', () => {
     test('index.html contains ball size buttons with hitArea', () => {
         expect(indexHtml).toContain('ballBtns');
         expect(indexHtml).toContain('setBall');
-        expect(indexHtml).toContain('setInteractive(new Phaser.Geom.Circle');
+        expect(indexHtml).toContain('Phaser.Geom.Circle.Contains');
     });
 
     test('index.html contains fire button with hitArea', () => {
         expect(indexHtml).toContain('fireBtn');
         expect(indexHtml).toContain('fire()');
-        expect(indexHtml).toContain('setInteractive(new Phaser.Geom.Circle');
+        expect(indexHtml).toContain('Phaser.Geom.Circle.Contains');
     });
 
     test('index.html contains powder button with hitArea', () => {
         expect(indexHtml).toContain('powderBtn');
         expect(indexHtml).toContain('addPowder');
-        expect(indexHtml).toContain('setInteractive(new Phaser.Geom.Rectangle');
+        expect(indexHtml).toContain('Phaser.Geom.Rectangle.Contains');
     });
 
     test('index.html contains castle creation', () => {
