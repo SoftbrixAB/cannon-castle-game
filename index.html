@@ -208,6 +208,14 @@
                 this.barrel.fillStyle(0x2F4F4F);
                 this.barrel.fillRect(0, -10, 80, 20);
                 this.angle = -0.3;
+                // Make barrel itself draggable
+                this.barrel.setInteractive(new Phaser.Geom.Rectangle(-40, -10, 80, 20));
+                this.barrel.input.cursor = 'pointer';
+                this.barrel.on('pointerdown', (pointer) => {
+                    this.dragging = true;
+                    this.dragStartY = pointer.y;
+                    this.initialAngle = this.angle;
+                });
                 this.updateBarrel();
 
                 // Powder bag
@@ -371,19 +379,8 @@
             }
 
             onPointerDown(pointer) {
-                // Check if pointer is near the barrel area (140,480) to (220,520)
-                // This is a generous hit box that works regardless of barrel rotation
-                const barrelLeft = 140;
-                const barrelRight = 220;
-                const barrelTop = 480;
-                const barrelBottom = 520;
-                
-                if (pointer.x >= barrelLeft && pointer.x <= barrelRight && 
-                    pointer.y >= barrelTop && pointer.y <= barrelBottom) {
-                    this.dragging = true;
-                    this.dragStartY = pointer.y;
-                    this.initialAngle = this.angle;
-                }
+                // Barrel is now directly interactive, so we don't need the hit box check
+                // It's handled by the barrel's own pointerdown event
             }
 
             onPointerMove(pointer) {
@@ -424,7 +421,10 @@
                 const sx = 140 + Math.cos(this.angle) * l;
                 const sy = 500 + Math.sin(this.angle) * l;
                 const power = this.state.powder / 100;
-                const velocity = power * 600;
+                // Heavier balls travel slower (more mass = less acceleration from same force)
+                // velocity = power * base_velocity / sqrt(mass) to account for physics
+                const baseVelocity = 600;
+                const velocity = power * baseVelocity / Math.sqrt(cfg.mass);
 
                 const ball = this.add.graphics();
                 ball.fillStyle(cfg.color);
@@ -435,6 +435,7 @@
                 ball.body.setCircle(cfg.radius);
                 ball.body.setMass(cfg.mass);
                 ball.body.setDrag(cfg.drag);
+                ball.body.setBounce(0.3);
                 ball.body.setVelocity(
                     Math.cos(this.angle) * velocity,
                     Math.sin(this.angle) * velocity
@@ -493,6 +494,12 @@
             create() {
                 const castle = this.type.draw(this.scene, this.x, this.y);
                 this.parts.push(castle);
+                
+                // Enable physics for castle graphics
+                this.scene.physics.add.existing(castle);
+                castle.body.setRectangle(200, 300, true);
+                castle.body.setImmovable(true);
+                castle.body.setOffset(-100, -150);
 
                 // Health bar
                 this.hpBg = this.scene.add.graphics();
