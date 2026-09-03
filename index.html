@@ -497,9 +497,10 @@
                 
                 // Enable physics for castle graphics
                 this.scene.physics.add.existing(castle);
-                castle.body.setRectangle(200, 300, true);
-                castle.body.setImmovable(true);
-                castle.body.setOffset(-100, -150);
+                const body = castle.body;
+                body.setSize(200, 300);
+                body.setOffset(-100, -150);
+                body.setImmovable(true);
 
                 // Health bar
                 this.hpBg = this.scene.add.graphics();
