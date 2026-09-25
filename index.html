@@ -93,6 +93,7 @@
                 },
                 drawWithPhysics: function(scene, x, y, partsArray) {
                     // y = 500 (ground level)
+                    // Ground body covers y=500 to y=550
                     // Main tower base (heavy, sits on ground)
                     const mainTower = scene.add.graphics();
                     mainTower.fillStyle(this.colors.stone, 1);
@@ -101,7 +102,7 @@
                     mainTower.strokeRect(x - 40, y - 100, 80, 100);
                     scene.physics.add.existing(mainTower);
                     mainTower.body.setSize(80, 100);
-                    mainTower.body.setOffset(-40, -50);
+                    mainTower.body.setOffset(-40, -48);
                     mainTower.body.setMass(10);
                     mainTower.setPosition(x, y - 50);
                     partsArray.push(mainTower);
@@ -141,7 +142,7 @@
                     leftTower.fillRect(0, 0, 60, 80);
                     scene.physics.add.existing(leftTower);
                     leftTower.body.setSize(60, 80);
-                    leftTower.body.setOffset(-30, -40);
+                    leftTower.body.setOffset(-30, -39);
                     leftTower.body.setMass(4);
                     leftTower.setPosition(x - 70, y - 40);
                     partsArray.push(leftTower);
@@ -152,7 +153,7 @@
                     rightTower.fillRect(0, 0, 60, 80);
                     scene.physics.add.existing(rightTower);
                     rightTower.body.setSize(60, 80);
-                    rightTower.body.setOffset(-30, -40);
+                    rightTower.body.setOffset(-30, -39);
                     rightTower.body.setMass(4);
                     rightTower.setPosition(x + 70, y - 40);
                     partsArray.push(rightTower);
@@ -269,7 +270,7 @@
                     mainBuilding.strokeRect(x - 100, y - 50, 200, 50);
                     scene.physics.add.existing(mainBuilding);
                     mainBuilding.body.setSize(200, 50);
-                    mainBuilding.body.setOffset(-100, -25);
+                    mainBuilding.body.setOffset(-100, -24);
                     mainBuilding.body.setMass(15);
                     mainBuilding.setPosition(x, y - 25);
                     partsArray.push(mainBuilding);
@@ -311,7 +312,7 @@
                     leftWing.fillRect(0, 0, 80, 30);
                     scene.physics.add.existing(leftWing);
                     leftWing.body.setSize(80, 30);
-                    leftWing.body.setOffset(-40, -15);
+                    leftWing.body.setOffset(-40, -14);
                     leftWing.body.setMass(5);
                     leftWing.setPosition(x - 140, y - 15);
                     partsArray.push(leftWing);
@@ -322,7 +323,7 @@
                     rightWing.fillRect(0, 0, 80, 30);
                     scene.physics.add.existing(rightWing);
                     rightWing.body.setSize(80, 30);
-                    rightWing.body.setOffset(-40, -15);
+                    rightWing.body.setOffset(-40, -14);
                     rightWing.body.setMass(5);
                     rightWing.setPosition(x + 140, y - 15);
                     partsArray.push(rightWing);
@@ -731,7 +732,7 @@
                 this.health = 100 * type.difficulty;
                 this.maxHealth = this.health;
                 this.x = 600;
-                this.y = 499;  // Position castle base 1px above ground so parts settle on it
+                this.y = 500;  // Position castle base at ground level
                 this.parts = [];
                 this.create();
             }
