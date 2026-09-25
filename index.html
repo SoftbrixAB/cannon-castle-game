@@ -104,6 +104,7 @@
                     mainTower.body.setSize(80, 100);
                     mainTower.body.setOffset(-40, -48);
                     mainTower.body.setMass(10);
+                    mainTower.body.setAllowGravity(false);
                     mainTower.setPosition(x, y - 50);
                     partsArray.push(mainTower);
                     
@@ -117,6 +118,7 @@
                     towerTop.body.setSize(80, 100);
                     towerTop.body.setOffset(-40, -50);
                     towerTop.body.setMass(5);
+                    towerTop.body.setAllowGravity(false);
                     towerTop.setPosition(x, y - 150);
                     partsArray.push(towerTop);
                     
@@ -133,6 +135,7 @@
                     roof.body.setSize(90, 50);
                     roof.body.setOffset(-45, -25);
                     roof.body.setMass(2);
+                    roof.body.setAllowGravity(false);
                     roof.setPosition(x, y - 225);
                     partsArray.push(roof);
                     
@@ -144,6 +147,7 @@
                     leftTower.body.setSize(60, 80);
                     leftTower.body.setOffset(-30, -39);
                     leftTower.body.setMass(4);
+                    leftTower.body.setAllowGravity(false);
                     leftTower.setPosition(x - 70, y - 40);
                     partsArray.push(leftTower);
                     
@@ -155,6 +159,7 @@
                     rightTower.body.setSize(60, 80);
                     rightTower.body.setOffset(-30, -39);
                     rightTower.body.setMass(4);
+                    rightTower.body.setAllowGravity(false);
                     rightTower.setPosition(x + 70, y - 40);
                     partsArray.push(rightTower);
                     
@@ -171,6 +176,7 @@
                     leftRoof.body.setSize(60, 40);
                     leftRoof.body.setOffset(-30, -20);
                     leftRoof.body.setMass(1);
+                    leftRoof.body.setAllowGravity(false);
                     leftRoof.setPosition(x - 70, y - 80);
                     partsArray.push(leftRoof);
                     
@@ -187,6 +193,7 @@
                     rightRoof.body.setSize(60, 40);
                     rightRoof.body.setOffset(-30, -20);
                     rightRoof.body.setMass(1);
+                    rightRoof.body.setAllowGravity(false);
                     rightRoof.setPosition(x + 70, y - 80);
                     partsArray.push(rightRoof);
                     
@@ -198,6 +205,7 @@
                     walls.body.setSize(200, 30);
                     walls.body.setOffset(-100, -15);
                     walls.body.setMass(3);
+                    walls.body.setAllowGravity(false);
                     walls.setPosition(x, y - 30);
                     partsArray.push(walls);
                     
@@ -272,6 +280,7 @@
                     mainBuilding.body.setSize(200, 50);
                     mainBuilding.body.setOffset(-100, -24);
                     mainBuilding.body.setMass(15);
+                    mainBuilding.body.setAllowGravity(false);
                     mainBuilding.setPosition(x, y - 25);
                     partsArray.push(mainBuilding);
                     
@@ -285,6 +294,7 @@
                     buildingTop.body.setSize(200, 50);
                     buildingTop.body.setOffset(-100, -25);
                     buildingTop.body.setMass(8);
+                    buildingTop.body.setAllowGravity(false);
                     buildingTop.setPosition(x, y - 75);
                     partsArray.push(buildingTop);
                     
@@ -303,6 +313,7 @@
                     roof.body.setSize(220, 40);
                     roof.body.setOffset(-110, -20);
                     roof.body.setMass(3);
+                    roof.body.setAllowGravity(false);
                     roof.setPosition(x, y - 110);
                     partsArray.push(roof);
                     
@@ -314,6 +325,7 @@
                     leftWing.body.setSize(80, 30);
                     leftWing.body.setOffset(-40, -14);
                     leftWing.body.setMass(5);
+                    leftWing.body.setAllowGravity(false);
                     leftWing.setPosition(x - 140, y - 15);
                     partsArray.push(leftWing);
                     
@@ -325,6 +337,7 @@
                     rightWing.body.setSize(80, 30);
                     rightWing.body.setOffset(-40, -14);
                     rightWing.body.setMass(5);
+                    rightWing.body.setAllowGravity(false);
                     rightWing.setPosition(x + 140, y - 15);
                     partsArray.push(rightWing);
                     
@@ -432,10 +445,7 @@
                 this.barrel.fillRect(0, -10, 80, 20);
                 this.angle = -0.3;
                 // Make barrel itself draggable
-                this.barrel.setInteractive({
-                    hitArea: new Phaser.Geom.Rectangle(-40, -10, 80, 20),
-                    hitAreaCallback: Phaser.Geom.Rectangle.Contains
-                });
+                this.barrel.setInteractive(new Phaser.Geom.Rectangle(-40, -10, 80, 20));
                 this.barrel.input.cursor = 'pointer';
                 this.barrel.on('pointerdown', (pointer) => {
                     this.dragging = true;
@@ -449,10 +459,7 @@
                 this.powderBtn.setPosition(20, 450);
                 this.powderBtn.fillStyle(0x8B4513);
                 this.powderBtn.fillRect(0, 0, 40, 50);
-                this.powderBtn.setInteractive({
-                    hitArea: new Phaser.Geom.Rectangle(0, 0, 40, 50),
-                    hitAreaCallback: Phaser.Geom.Rectangle.Contains
-                });
+                this.powderBtn.setInteractive(new Phaser.Geom.Rectangle(0, 0, 40, 50));
                 this.powderBtn.input.cursor = 'pointer';
                 this.powderBtn.on('pointerdown', () => this.addPowder(10));
                 this.add.text(40, 475, '💣');
@@ -466,10 +473,7 @@
                     btn.fillStyle(this.state.ballSize === s ? 0xFFD700 : 0xC0C0C0);
                     btn.fillCircle(0, 0, 25);
                     // Make click area larger with custom hitArea
-                    btn.setInteractive({
-                        hitArea: new Phaser.Geom.Circle(0, 0, 30),
-                        hitAreaCallback: Phaser.Geom.Circle.Contains
-                    });
+                    btn.setInteractive(new Phaser.Geom.Circle(0, 0, 30));
                     btn.input.cursor = 'pointer';
                     btn.on('pointerdown', () => this.setBall(s));
                     this.add.text(x, 550, CANNONBALLS[s].label, {font:'20px Arial',fill:'#000'}).setOrigin(0.5);
@@ -486,10 +490,7 @@
                 this.fireBtn = this.add.graphics();
                 this.fireBtn.fillStyle(0xFF4500);
                 this.fireBtn.fillCircle(0, 0, 25);
-                this.fireBtn.setInteractive({
-                    hitArea: new Phaser.Geom.Circle(0, 0, 25),
-                    hitAreaCallback: Phaser.Geom.Circle.Contains
-                });
+                this.fireBtn.setInteractive(new Phaser.Geom.Circle(0, 0, 25));
                 this.fireBtn.input.cursor = 'pointer';
                 this.fireBtn.on('pointerdown', () => this.fire());
                 this.fireBtn.setVisible(false);
@@ -656,10 +657,10 @@
                 const sx = 140 + Math.cos(this.angle) * l;
                 const sy = 500 + Math.sin(this.angle) * l;
                 const power = this.state.powder / 100;
-                // Heavier balls travel slower (more mass = less acceleration from same force)
-                // velocity = power * base_velocity / sqrt(mass) to account for physics
+                // Heavier balls travel slower, but not too much - use cube root for gentler scaling
+                // velocity = power * base_velocity / mass^(1/3) for better balance
                 const baseVelocity = 600;
-                const velocity = power * baseVelocity / Math.sqrt(cfg.mass);
+                const velocity = power * baseVelocity / Math.pow(cfg.mass, 1/3);
 
                 const ball = this.add.graphics();
                 ball.fillStyle(cfg.color);
@@ -810,6 +811,7 @@
         // ========== INIT ==========
         window.addEventListener("load", () => {
             const game = new Phaser.Game(CONFIG);
+            window.cannonGame = game; // Store globally for testing
         });
     </script>
 </body>
