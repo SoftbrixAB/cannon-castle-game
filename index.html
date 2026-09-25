@@ -90,6 +90,124 @@
                     }
                     
                     return g;
+                },
+                drawWithPhysics: function(scene, x, y, partsArray) {
+                    // y = 500 (ground level)
+                    // Main tower base (heavy, sits on ground)
+                    const mainTower = scene.add.graphics();
+                    mainTower.fillStyle(this.colors.stone, 1);
+                    mainTower.fillRect(x - 40, y - 100, 80, 100);
+                    mainTower.lineStyle(2, this.colors.detail);
+                    mainTower.strokeRect(x - 40, y - 100, 80, 100);
+                    scene.physics.add.existing(mainTower);
+                    mainTower.body.setSize(80, 100);
+                    mainTower.body.setOffset(-40, -50);
+                    mainTower.body.setMass(10);
+                    mainTower.setPosition(x, y - 50);
+                    partsArray.push(mainTower);
+                    
+                    // Main tower top
+                    const towerTop = scene.add.graphics();
+                    towerTop.fillStyle(this.colors.stone, 1);
+                    towerTop.fillRect(x - 40, y - 200, 80, 100);
+                    towerTop.lineStyle(2, this.colors.detail);
+                    towerTop.strokeRect(x - 40, y - 200, 80, 100);
+                    scene.physics.add.existing(towerTop);
+                    towerTop.body.setSize(80, 100);
+                    towerTop.body.setOffset(-40, -50);
+                    towerTop.body.setMass(5);
+                    towerTop.setPosition(x, y - 150);
+                    partsArray.push(towerTop);
+                    
+                    // Conical roof
+                    const roof = scene.add.graphics();
+                    roof.fillStyle(this.colors.roof, 1);
+                    roof.beginPath();
+                    roof.moveTo(x - 45, y - 200);
+                    roof.lineTo(x, y - 250);
+                    roof.lineTo(x + 45, y - 200);
+                    roof.closePath();
+                    roof.fillPath();
+                    scene.physics.add.existing(roof);
+                    roof.body.setSize(90, 50);
+                    roof.body.setOffset(-45, -25);
+                    roof.body.setMass(2);
+                    roof.setPosition(x, y - 225);
+                    partsArray.push(roof);
+                    
+                    // Left side tower
+                    const leftTower = scene.add.graphics();
+                    leftTower.fillStyle(this.colors.stone, 1);
+                    leftTower.fillRect(0, 0, 60, 80);
+                    scene.physics.add.existing(leftTower);
+                    leftTower.body.setSize(60, 80);
+                    leftTower.body.setOffset(-30, -40);
+                    leftTower.body.setMass(4);
+                    leftTower.setPosition(x - 70, y - 40);
+                    partsArray.push(leftTower);
+                    
+                    // Right side tower
+                    const rightTower = scene.add.graphics();
+                    rightTower.fillStyle(this.colors.stone, 1);
+                    rightTower.fillRect(0, 0, 60, 80);
+                    scene.physics.add.existing(rightTower);
+                    rightTower.body.setSize(60, 80);
+                    rightTower.body.setOffset(-30, -40);
+                    rightTower.body.setMass(4);
+                    rightTower.setPosition(x + 70, y - 40);
+                    partsArray.push(rightTower);
+                    
+                    // Left pointed roof
+                    const leftRoof = scene.add.graphics();
+                    leftRoof.fillStyle(this.colors.roof, 1);
+                    leftRoof.beginPath();
+                    leftRoof.moveTo(0, 0);
+                    leftRoof.lineTo(30, -40);
+                    leftRoof.lineTo(60, 0);
+                    leftRoof.closePath();
+                    leftRoof.fillPath();
+                    scene.physics.add.existing(leftRoof);
+                    leftRoof.body.setSize(60, 40);
+                    leftRoof.body.setOffset(-30, -20);
+                    leftRoof.body.setMass(1);
+                    leftRoof.setPosition(x - 70, y - 80);
+                    partsArray.push(leftRoof);
+                    
+                    // Right pointed roof
+                    const rightRoof = scene.add.graphics();
+                    rightRoof.fillStyle(this.colors.roof, 1);
+                    rightRoof.beginPath();
+                    rightRoof.moveTo(0, 0);
+                    rightRoof.lineTo(30, -40);
+                    rightRoof.lineTo(60, 0);
+                    rightRoof.closePath();
+                    rightRoof.fillPath();
+                    scene.physics.add.existing(rightRoof);
+                    rightRoof.body.setSize(60, 40);
+                    rightRoof.body.setOffset(-30, -20);
+                    rightRoof.body.setMass(1);
+                    rightRoof.setPosition(x + 70, y - 80);
+                    partsArray.push(rightRoof);
+                    
+                    // Walls
+                    const walls = scene.add.graphics();
+                    walls.fillStyle(this.colors.stone, 1);
+                    walls.fillRect(0, 0, 200, 30);
+                    scene.physics.add.existing(walls);
+                    walls.body.setSize(200, 30);
+                    walls.body.setOffset(-100, -15);
+                    walls.body.setMass(3);
+                    walls.setPosition(x, y - 30);
+                    partsArray.push(walls);
+                    
+                    // Windows (decorative, no physics)
+                    for (let i = 0; i < 3; i++) {
+                        const win = scene.add.graphics();
+                        win.fillStyle(this.colors.window, 1);
+                        win.fillRect(x - 30 + i * 20, y - 160 + i * 30, 10, 15);
+                        win.fillRect(x + i * 20, y - 160 + i * 30, 10, 15);
+                        partsArray.push(win);
+                    }
                 }
             },
             {
@@ -140,6 +258,98 @@
                     g.fillRect(x - 150, y, 300, 40);
                     
                     return g;
+                },
+                drawWithPhysics: function(scene, x, y, partsArray) {
+                    // y = 500 (ground level)
+                    // Main building base
+                    const mainBuilding = scene.add.graphics();
+                    mainBuilding.fillStyle(this.colors.stone, 1);
+                    mainBuilding.fillRect(x - 100, y - 50, 200, 50);
+                    mainBuilding.lineStyle(2, this.colors.detail);
+                    mainBuilding.strokeRect(x - 100, y - 50, 200, 50);
+                    scene.physics.add.existing(mainBuilding);
+                    mainBuilding.body.setSize(200, 50);
+                    mainBuilding.body.setOffset(-100, -25);
+                    mainBuilding.body.setMass(15);
+                    mainBuilding.setPosition(x, y - 25);
+                    partsArray.push(mainBuilding);
+                    
+                    // Main building top
+                    const buildingTop = scene.add.graphics();
+                    buildingTop.fillStyle(this.colors.stone, 1);
+                    buildingTop.fillRect(x - 100, y - 100, 200, 50);
+                    buildingTop.lineStyle(2, this.colors.detail);
+                    buildingTop.strokeRect(x - 100, y - 100, 200, 50);
+                    scene.physics.add.existing(buildingTop);
+                    buildingTop.body.setSize(200, 50);
+                    buildingTop.body.setOffset(-100, -25);
+                    buildingTop.body.setMass(8);
+                    buildingTop.setPosition(x, y - 75);
+                    partsArray.push(buildingTop);
+                    
+                    // Mansard roof
+                    const roof = scene.add.graphics();
+                    roof.fillStyle(this.colors.roof, 1);
+                    roof.fillRect(x - 110, y - 100, 220, 20);
+                    roof.beginPath();
+                    roof.moveTo(x - 110, y - 100);
+                    roof.lineTo(x - 120, y - 120);
+                    roof.lineTo(x + 120, y - 120);
+                    roof.lineTo(x + 110, y - 100);
+                    roof.closePath();
+                    roof.fillPath();
+                    scene.physics.add.existing(roof);
+                    roof.body.setSize(220, 40);
+                    roof.body.setOffset(-110, -20);
+                    roof.body.setMass(3);
+                    roof.setPosition(x, y - 110);
+                    partsArray.push(roof);
+                    
+                    // Left wing
+                    const leftWing = scene.add.graphics();
+                    leftWing.fillStyle(this.colors.stone, 1);
+                    leftWing.fillRect(0, 0, 80, 30);
+                    scene.physics.add.existing(leftWing);
+                    leftWing.body.setSize(80, 30);
+                    leftWing.body.setOffset(-40, -15);
+                    leftWing.body.setMass(5);
+                    leftWing.setPosition(x - 140, y - 15);
+                    partsArray.push(leftWing);
+                    
+                    // Right wing
+                    const rightWing = scene.add.graphics();
+                    rightWing.fillStyle(this.colors.stone, 1);
+                    rightWing.fillRect(0, 0, 80, 30);
+                    scene.physics.add.existing(rightWing);
+                    rightWing.body.setSize(80, 30);
+                    rightWing.body.setOffset(-40, -15);
+                    rightWing.body.setMass(5);
+                    rightWing.setPosition(x + 140, y - 15);
+                    partsArray.push(rightWing);
+                    
+                    // Decorative columns (decorative, no physics)
+                    for (let i = 0; i < 3; i++) {
+                        const col = scene.add.graphics();
+                        col.fillStyle(this.colors.detail, 1);
+                        col.fillRect(x - 80 + i * 40, y - 80, 5, 30);
+                        col.fillRect(x - 85 + i * 40, y - 80, 15, 5);
+                        partsArray.push(col);
+                    }
+                    
+                    // Windows (decorative, no physics)
+                    for (let i = 0; i < 5; i++) {
+                        const win = scene.add.graphics();
+                        win.fillStyle(this.colors.window, 1);
+                        win.fillRect(x - 90 + i * 40, y - 60, 12, 18);
+                        win.fillRect(x - 90 + i * 40, y - 20, 12, 18);
+                        partsArray.push(win);
+                    }
+                    
+                    // Gardens (decorative, no physics)
+                    const garden = scene.add.graphics();
+                    garden.fillStyle(0x2E8B57, 0.4);
+                    garden.fillRect(x - 150, y + 20, 300, 40);
+                    partsArray.push(garden);
                 }
             }
         ];
@@ -172,6 +382,7 @@
                 this.input.on('pointerup', this.onPointerUp, this);
 
                 this.createBG();
+                this.createGround();
                 this.createCastle();
                 this.createCannon();
                 this.createUI();
@@ -189,9 +400,20 @@
                 g.fillRect(0, 500, 800, 100);
             }
 
+            createGround() {
+                this.ground = this.add.graphics();
+                this.ground.fillStyle(0x228B22);
+                this.ground.fillRect(0, 500, 800, 50);
+                this.physics.add.existing(this.ground);
+                this.ground.body.setSize(800, 50);
+                this.ground.body.setOffset(0, 0);
+                this.ground.body.setImmovable(true);
+                this.ground.body.setAllowGravity(false);
+            }
+
             createCastle() {
                 this.castleIdx = 0;
-                this.castle = new Castle(this, CASTLES[this.castleIdx]);
+                this.castle = new Castle(this, CASTLES[this.castleIdx], this.ground);
             }
 
             createCannon() {
@@ -209,7 +431,10 @@
                 this.barrel.fillRect(0, -10, 80, 20);
                 this.angle = -0.3;
                 // Make barrel itself draggable
-                this.barrel.setInteractive(new Phaser.Geom.Rectangle(-40, -10, 80, 20));
+                this.barrel.setInteractive({
+                    hitArea: new Phaser.Geom.Rectangle(-40, -10, 80, 20),
+                    hitAreaCallback: Phaser.Geom.Rectangle.Contains
+                });
                 this.barrel.input.cursor = 'pointer';
                 this.barrel.on('pointerdown', (pointer) => {
                     this.dragging = true;
@@ -223,7 +448,10 @@
                 this.powderBtn.setPosition(20, 450);
                 this.powderBtn.fillStyle(0x8B4513);
                 this.powderBtn.fillRect(0, 0, 40, 50);
-                this.powderBtn.setInteractive(new Phaser.Geom.Rectangle(0, 0, 40, 50), Phaser.Geom.Rectangle.Contains);
+                this.powderBtn.setInteractive({
+                    hitArea: new Phaser.Geom.Rectangle(0, 0, 40, 50),
+                    hitAreaCallback: Phaser.Geom.Rectangle.Contains
+                });
                 this.powderBtn.input.cursor = 'pointer';
                 this.powderBtn.on('pointerdown', () => this.addPowder(10));
                 this.add.text(40, 475, '💣');
@@ -237,7 +465,10 @@
                     btn.fillStyle(this.state.ballSize === s ? 0xFFD700 : 0xC0C0C0);
                     btn.fillCircle(0, 0, 25);
                     // Make click area larger with custom hitArea
-                    btn.setInteractive(new Phaser.Geom.Circle(0, 0, 30), Phaser.Geom.Circle.Contains);
+                    btn.setInteractive({
+                        hitArea: new Phaser.Geom.Circle(0, 0, 30),
+                        hitAreaCallback: Phaser.Geom.Circle.Contains
+                    });
                     btn.input.cursor = 'pointer';
                     btn.on('pointerdown', () => this.setBall(s));
                     this.add.text(x, 550, CANNONBALLS[s].label, {font:'20px Arial',fill:'#000'}).setOrigin(0.5);
@@ -254,7 +485,10 @@
                 this.fireBtn = this.add.graphics();
                 this.fireBtn.fillStyle(0xFF4500);
                 this.fireBtn.fillCircle(0, 0, 25);
-                this.fireBtn.setInteractive(new Phaser.Geom.Circle(0, 0, 25), Phaser.Geom.Circle.Contains);
+                this.fireBtn.setInteractive({
+                    hitArea: new Phaser.Geom.Circle(0, 0, 25),
+                    hitAreaCallback: Phaser.Geom.Circle.Contains
+                });
                 this.fireBtn.input.cursor = 'pointer';
                 this.fireBtn.on('pointerdown', () => this.fire());
                 this.fireBtn.setVisible(false);
@@ -453,9 +687,19 @@
                 flash.fillCircle(sx, sy, 15);
                 this.tweens.add({targets:flash, radius:0, alpha:0, duration:200, onComplete:()=>flash.destroy()});
 
-                // Collision
-                this.physics.add.collider(ball, this.castle.parts, (b,p) => this.hitCastle(b));
+                // Collision - only collide with parts that have physics bodies
+                const physicsParts = this.castle.parts.filter(p => p.body);
+                this.physics.add.collider(ball, physicsParts, (b,p) => this.hitCastle(b));
                 this.physics.add.collider(ball, this.physics.world.bounds, () => {
+                    const dust = this.add.graphics();
+                    dust.fillStyle(0x8B4513, 0.7);
+                    dust.fillEllipse(b.x, b.y, 25, 15);
+                    this.tweens.add({targets:dust, alpha:0, scale:1.5, duration:300, onComplete:()=>dust.destroy()});
+                    b.destroy();
+                });
+                
+                // Also collide with ground
+                this.physics.add.collider(ball, this.ground, () => {
                     const dust = this.add.graphics();
                     dust.fillStyle(0x8B4513, 0.7);
                     dust.fillEllipse(b.x, b.y, 25, 15);
@@ -480,35 +724,36 @@
 
         // ========== CASTLE CLASS ==========
         class Castle {
-            constructor(scene, type) {
+            constructor(scene, type, ground) {
                 this.scene = scene;
                 this.type = type;
+                this.ground = ground;
                 this.health = 100 * type.difficulty;
                 this.maxHealth = this.health;
                 this.x = 600;
-                this.y = 300;
+                this.y = 499;  // Position castle base 1px above ground so parts settle on it
                 this.parts = [];
                 this.create();
             }
 
             create() {
-                const castle = this.type.draw(this.scene, this.x, this.y);
-                this.parts.push(castle);
+                // Draw castle with individual parts that can each have physics
+                this.type.drawWithPhysics(this.scene, this.x, this.y, this.parts);
                 
-                // Enable physics for castle graphics
-                this.scene.physics.add.existing(castle);
-                const body = castle.body;
-                body.setSize(200, 300);
-                body.setOffset(-100, -150);
-                body.setImmovable(true);
+                // Set up collision with ground immediately
+                const castlePhysicsParts = this.parts.filter(p => p.body);
+                if (this.ground && castlePhysicsParts.length > 0) {
+                    this.scene.physics.add.collider(castlePhysicsParts, this.ground);
+                    this.scene.physics.add.collider(castlePhysicsParts, castlePhysicsParts);
+                }
 
-                // Health bar
+                // Health bar (positioned above the castle)
                 this.hpBg = this.scene.add.graphics();
                 this.hpBg.fillStyle(0x000000, 0.5);
-                this.hpBg.fillRoundedRect(this.x - 50, this.y - 150, 100, 10, 5);
+                this.hpBg.fillRoundedRect(this.x - 50, this.y - 200, 100, 10, 5);
                 this.hpBar = this.scene.add.graphics();
                 this.hpBar.fillStyle(0x00FF00);
-                this.hpBar.fillRoundedRect(this.x - 50, this.y - 150, 100, 10, 5);
+                this.hpBar.fillRoundedRect(this.x - 50, this.y - 200, 100, 10, 5);
             }
 
             takeDamage(dmg) {
@@ -516,7 +761,7 @@
                 const p = (this.health / this.maxHealth) * 100;
                 this.hpBar.clear();
                 this.hpBar.fillStyle(p < 30 ? 0xFF0000 : p < 60 ? 0xFFA500 : 0x00FF00);
-                this.hpBar.fillRoundedRect(this.x - 50, this.y - 150, p, 10, 5);
+                this.hpBar.fillRoundedRect(this.x - 50, this.y - 200, p, 10, 5);
 
                 this.parts.forEach(p => {
                     this.scene.tweens.add({targets:p, x:p.x+Phaser.Math.Between(-3,3), y:p.y+Phaser.Math.Between(-3,3), duration:50, yoyo:true});

@@ -7,12 +7,27 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
-    "test:all": "jest && jest page-load.test.js"
+    "test:all": "jest && jest page-load.test.js",
+    "test:playwright": "cd playwright && playwright test",
+    "test:play": "cd playwright && playwright test",
+    "test:full": "jest && cd playwright && playwright test"
   },
-  "keywords": ["game", "test", "phaser"],
+  "keywords": [
+    "game",
+    "test",
+    "phaser"
+  ],
   "author": "",
   "license": "MIT",
+  "jest": {
+    "testEnvironment": "node",
+    "testPathIgnorePatterns": ["/playwright/"]
+  },
   "devDependencies": {
     "jest": "^29.7.0"
+  },
+  "dependencies": {
+    "@playwright/test": "^1.40.0",
+    "playwright": "^1.40.0"
   }
 }
