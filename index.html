@@ -809,6 +809,15 @@
         };
 
         // ========== INIT ==========
+        window.errors = [];
+        window.addEventListener("error", (e) => {
+            window.errors.push(e.message || e);
+            console.error("Error:", e.message, e.stack);
+        });
+        window.addEventListener("unhandledrejection", (e) => {
+            window.errors.push(e.reason.message || e.reason);
+            console.error("Unhandled rejection:", e.reason);
+        });
         window.addEventListener("load", () => {
             const game = new Phaser.Game(CONFIG);
             window.cannonGame = game; // Store globally for testing
