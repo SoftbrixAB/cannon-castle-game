@@ -57,6 +57,11 @@ test.describe('Mouse Interactions Test', () => {
             return window.errors || [];
         });
         
+        // Log errors for debugging
+        if (errors.length > 0) {
+            console.log('Errors found:', errors);
+        }
+        
         expect(errors.length).toBe(0);
     });
 
