@@ -66,13 +66,12 @@ test.describe('hitAreaCallback Error Fix Verification', () => {
         expect(content).not.toContain('hitAreaCallback');
     });
 
-    test('setInteractive uses input.hitArea for custom shapes', async ({ page }) => {
+    test('setInteractive uses simple syntax with shape', async ({ page }) => {
         const filePath = path.join(__dirname, '../../index.html');
         const content = require('fs').readFileSync(filePath, 'utf8');
         
-        // Verify that setInteractive is called and hitArea is set separately
-        expect(content).toContain('setInteractive()');
-        expect(content).toContain('input.hitArea = new Phaser.Geom.Circle');
-        expect(content).toContain('input.hitArea = new Phaser.Geom.Rectangle');
+        // Verify that setInteractive is called with simple shape syntax
+        expect(content).toContain('setInteractive(new Phaser.Geom.Circle');
+        expect(content).toContain('setInteractive(new Phaser.Geom.Rectangle');
     });
 });
