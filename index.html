@@ -445,7 +445,8 @@
                 this.barrel.fillRect(0, -10, 80, 20);
                 this.angle = -0.3;
                 // Make barrel itself draggable
-                this.barrel.setInteractive(new Phaser.Geom.Rectangle(-40, -10, 80, 20));
+                this.barrel.setInteractive();
+                this.barrel.input.hitArea = new Phaser.Geom.Rectangle(-40, -10, 80, 20);
                 this.barrel.input.cursor = 'pointer';
                 this.barrel.on('pointerdown', (pointer) => {
                     this.dragging = true;
@@ -459,7 +460,8 @@
                 this.powderBtn.setPosition(20, 450);
                 this.powderBtn.fillStyle(0x8B4513);
                 this.powderBtn.fillRect(0, 0, 40, 50);
-                this.powderBtn.setInteractive(new Phaser.Geom.Rectangle(0, 0, 40, 50));
+                this.powderBtn.setInteractive();
+                this.powderBtn.input.hitArea = new Phaser.Geom.Rectangle(0, 0, 40, 50);
                 this.powderBtn.input.cursor = 'pointer';
                 this.powderBtn.on('pointerdown', () => this.addPowder(10));
                 this.add.text(40, 475, '💣');
@@ -473,7 +475,8 @@
                     btn.fillStyle(this.state.ballSize === s ? 0xFFD700 : 0xC0C0C0);
                     btn.fillCircle(0, 0, 25);
                     // Make click area larger with custom hitArea
-                    btn.setInteractive(new Phaser.Geom.Circle(0, 0, 30));
+                    btn.setInteractive();
+                    btn.input.hitArea = new Phaser.Geom.Circle(0, 0, 30);
                     btn.input.cursor = 'pointer';
                     btn.on('pointerdown', () => this.setBall(s));
                     this.add.text(x, 550, CANNONBALLS[s].label, {font:'20px Arial',fill:'#000'}).setOrigin(0.5);
@@ -490,7 +493,8 @@
                 this.fireBtn = this.add.graphics();
                 this.fireBtn.fillStyle(0xFF4500);
                 this.fireBtn.fillCircle(0, 0, 25);
-                this.fireBtn.setInteractive(new Phaser.Geom.Circle(0, 0, 25));
+                this.fireBtn.setInteractive();
+                this.fireBtn.input.hitArea = new Phaser.Geom.Circle(0, 0, 25);
                 this.fireBtn.input.cursor = 'pointer';
                 this.fireBtn.on('pointerdown', () => this.fire());
                 this.fireBtn.setVisible(false);
