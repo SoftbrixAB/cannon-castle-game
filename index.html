@@ -210,7 +210,7 @@
                 const btn = this.add.graphics();
                 btn.fillStyle(0x4CAF50);
                 btn.fillRoundedRect(750, 550, 120, 40, 5);
-                btn.setInteractive();
+                btn.setInteractive(new Phaser.Geom.Rectangle(750, 550, 120, 40));
                 btn.on('pointerdown', () => this.startMiniGame());
                 this.add.text(750, 550, 'Mini-Game', {font:'16px Arial',fill:'#fff'}).setOrigin(0.5);
             }
@@ -236,7 +236,7 @@
                     const btn = this.add.graphics();
                     btn.fillStyle(0x3498DB);
                     btn.fillRoundedRect(400, 280+i*60, 500, 40, 5);
-                    btn.setInteractive();
+                    btn.setInteractive(new Phaser.Geom.Rectangle(400, 280+i*60, 500, 40));
                     btn.on('pointerdown', () => this.checkAnswer(i, q.correct, btn));
                     this.add.text(400, 280+i*60, a, {font:'18px Arial',fill:'#fff',wordWrap:{width:480}}).setOrigin(0.5);
                 });
@@ -244,7 +244,7 @@
                 const back = this.add.graphics();
                 back.fillStyle(0xF44336);
                 back.fillRoundedRect(750, 550, 120, 40, 5);
-                back.setInteractive();
+                back.setInteractive(new Phaser.Geom.Rectangle(750, 550, 120, 40));
                 back.on('pointerdown', () => this.closeMiniGame());
                 this.add.text(750, 550, 'Back', {font:'16px Arial',fill:'#fff'}).setOrigin(0.5);
             }
