@@ -31,8 +31,14 @@
     <script src="js/Castle.js"></script>
     <script src="js/sound.js"></script>
     <script>
+        const CANNONBALLS = window.CANNONBALLS;
+        const CASTLES = window.CASTLES;
+        const MINI_GAMES = window.MINI_GAMES;
+        const TRIVIA = window.TRIVIA;
+        const Castle = window.Castle;
 
         // ========== MAIN SCENE ==========
+        class MainScene extends Phaser.Scene {
         class MainScene extends Phaser.Scene {
             constructor() { super({ key: 'MainScene' }); }
 
@@ -79,7 +85,7 @@
 
             createCastle() {
                 this.castleIdx = 0;
-                this.castle = new window.Castle(this, window.CASTLES[this.castleIdx], this.ground);
+                this.castle = new Castle(this, CASTLES[this.castleIdx], this.ground);
             }
 
             createCannon() {
@@ -97,15 +103,8 @@
                 this.barrel.fillRect(0, -10, 80, 20);
                 this.angle = -0.3;
                 // Make barrel itself draggable
-                this.barrel.setInteractive();
-                if (this.barrel.input) {
-                    this.barrel.input.hitArea = new Phaser.Geom.Rectangle(-40, -10, 80, 20);
-                    this.barrel.input.hitAreaCallback = (x, y) => {
-                        const rect = this.barrel.input.hitArea;
-                        return rect && rect.contains(x, y);
-                    };
-                    this.barrel.input.cursor = 'pointer';
-                }
+                this.barrel.setInteractive(new Phaser.Geom.Rectangle(-40, -10, 80, 20));
+                this.barrel.input.cursor = 'pointer';
                 this.barrel.on('pointerdown', (pointer) => {
                     this.dragging = true;
                     this.dragStartY = pointer.y;
@@ -118,15 +117,8 @@
                 this.powderBtn.setPosition(20, 450);
                 this.powderBtn.fillStyle(0x8B4513);
                 this.powderBtn.fillRect(0, 0, 40, 50);
-                this.powderBtn.setInteractive();
-                if (this.powderBtn.input) {
-                    this.powderBtn.input.hitArea = new Phaser.Geom.Rectangle(0, 0, 40, 50);
-                    this.powderBtn.input.hitAreaCallback = (x, y) => {
-                        const rect = this.powderBtn.input.hitArea;
-                        return rect && rect.contains(x, y);
-                    };
-                    this.powderBtn.input.cursor = 'pointer';
-                }
+                this.powderBtn.setInteractive(new Phaser.Geom.Rectangle(0, 0, 40, 50));
+                this.powderBtn.input.cursor = 'pointer';
                 this.powderBtn.on('pointerdown', () => this.addPowder(10));
                 this.add.text(40, 475, '💣');
 
@@ -139,17 +131,10 @@
                     btn.fillStyle(this.state.ballSize === s ? 0xFFD700 : 0xC0C0C0);
                     btn.fillCircle(0, 0, 25);
                     // Make click area larger with custom hitArea
-                    btn.setInteractive();
-                    if (btn.input) {
-                        btn.input.hitArea = new Phaser.Geom.Circle(0, 0, 35);
-                        btn.input.hitAreaCallback = (x, y) => {
-                            const circle = btn.input.hitArea;
-                            return circle && circle.contains(x, y);
-                        };
-                        btn.input.cursor = 'pointer';
-                    }
+                    btn.setInteractive(new Phaser.Geom.Circle(0, 0, 30));
+                    btn.input.cursor = 'pointer';
                     btn.on('pointerdown', () => this.setBall(s));
-                    this.add.text(x, 550, window.CANNONBALLS[s].label, {font:'20px Arial',fill:'#000'}).setOrigin(0.5);
+                    this.add.text(x, 550, CANNONBALLS[s].label, {font:'20px Arial',fill:'#000'}).setOrigin(0.5);
                     // Debug: render pink clickable area
                     const debugArea = this.add.graphics();
                     debugArea.setPosition(150 + i * 60, 550);
@@ -163,15 +148,8 @@
                 this.fireBtn = this.add.graphics();
                 this.fireBtn.fillStyle(0xFF4500);
                 this.fireBtn.fillCircle(0, 0, 25);
-                this.fireBtn.setInteractive();
-                if (this.fireBtn.input) {
-                    this.fireBtn.input.hitArea = new Phaser.Geom.Circle(0, 0, 30);
-                    this.fireBtn.input.hitAreaCallback = (x, y) => {
-                        const circle = this.fireBtn.input.hitArea;
-                        return circle && circle.contains(x, y);
-                    };
-                    this.fireBtn.input.cursor = 'pointer';
-                }
+                this.fireBtn.setInteractive(new Phaser.Geom.Circle(0, 0, 25));
+                this.fireBtn.input.cursor = 'pointer';
                 this.fireBtn.on('pointerdown', () => this.fire());
                 this.fireBtn.setVisible(false);
                 this.updateFireBtn();
@@ -239,7 +217,7 @@
 
             startMiniGame() {
                 this.state.active = false;
-                const games = [window.MINI_GAMES[0]]; // Just trivia for now
+                const games = [MINI_GAMES[0]]; // Just trivia for now
                 this.showTrivia(games[0]);
             }
 
@@ -251,7 +229,7 @@
 
                 this.add.text(400, 100, game.name, {font:'32px Arial',fill:'#FFD700'}).setOrigin(0.5);
                 
-                const q = window.TRIVIA[Math.floor(Math.random()*window.TRIVIA.length)];
+                const q = TRIVIA[Math.floor(Math.random()*TRIVIA.length)];
                 this.add.text(400, 200, q.q, {font:'20px Arial',fill:'#fff',wordWrap:{width:600}}).setOrigin(0.5);
 
                 q.a.forEach((a,i) => {
@@ -332,7 +310,7 @@
             fire() {
                 if (!this.state.active || this.state.powder <= 0) return;
 
-                const cfg = window.CANNONBALLS[this.state.ballSize];
+                const cfg = CANNONBALLS[this.state.ballSize];
                 const l = 80;
                 const sx = 140 + Math.cos(this.angle) * l;
                 const sy = 500 + Math.sin(this.angle) * l;
